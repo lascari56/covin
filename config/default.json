@@ -31,5 +31,5 @@
   // "mongodb": "mongodb+srv://root:Victor565758!@cluster0.waajg.mongodb.net/?retryWrites=true&w=majority"
   // "mongodb": "mongodb+srv://root:victor565758@cluster0.gu8lf.mongodb.net/?retryWrites=true&w=majority",
   // "mongodb": "mongodb+srv://root:victor565758@cluster0.gu8lf.mongodb.net/?retryWrites=true&w=majority",
-  "mongodb": 'mongodb://root:victor565758@cluster0-shard-00-00.gu8lf.mongodb.net:27017,cluster0-shard-00-01.gu8lf.mongodb.net:27017,cluster0-shard-00-02.gu8lf.mongodb.net:27017/?ssl=true&replicaSet=atlas-et3v6f-shard-0&authSource=admin&retryWrites=true&w=majority'
+  "mongodb": "mongodb://root:victor565758@cluster0-shard-00-00.gu8lf.mongodb.net:27017,cluster0-shard-00-01.gu8lf.mongodb.net:27017,cluster0-shard-00-02.gu8lf.mongodb.net:27017/?ssl=true&replicaSet=atlas-et3v6f-shard-0&authSource=admin&retryWrites=true&w=majority"
 }
