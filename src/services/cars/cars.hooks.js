@@ -22,15 +22,20 @@ module.exports = {
             make: {},
             model: {},
             series: {},
+            year: {},
             odometer: {},
-            location: {},
+            loss: {},
+            damage_pr: {},
+            damage_sec: {},
+            drive: {},
             status: {},
             keys: {},
-            fuel: {},
-            drive: {},
+            transmission: {},
             engine: {},
+            fuel: {},
+            cost_repair: {},
+            location: {},
             document: {},
-
           };
 
           const model = createModel(context.app);
