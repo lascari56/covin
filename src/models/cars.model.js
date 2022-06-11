@@ -18,7 +18,6 @@ module.exports = function (app) {
     "cost_priced": {type: Number},
     "cost_repair": {type: Number},
     "year": { type: String },
-    "seller": { type: String },
     "auction_date": { type: String },
     "cylinders": {type: String},
     "state": { type: String },
@@ -43,7 +42,7 @@ module.exports = function (app) {
     "link_img_hd": { type: Array, default: [] },
     "location": { type: String },
     "document": { type: String },
-    "date": { type: Date, default: Date.now },
+    // "date": { type: Date, default: Date.now },
   }, {
     timestamps: true
   });
