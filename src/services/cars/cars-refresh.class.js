@@ -41,7 +41,7 @@ exports.CarsRefresh = class CarsRefresh {
 
     for (let item of lots?.data) {
       item.auction_date = item.auction_date ? moment(item.auction_date).toDate() : null;
-
+      
       let res = await this.model.findOneAndUpdate({'lot_id': item.lot_id}, item);
 
       if (!res && endLotsIds.indexOf(item.lot_id) === -1 && selledLotIds.indexOf(item.lot_id) === -1) this.model.create(item);
