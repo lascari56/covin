@@ -13,7 +13,9 @@ exports.CarsRefresh = class CarsRefresh {
     const {data} = await axios.get('https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag');
 
     for (let item of data) {
-      await this.model.findOneAndUpdate({'lot_id': item.lot_id}, item);
+      let res = await this.model.findOneAndUpdate({'lot_id': item.lot_id}, item);
+
+      if (!res) this.model.create(item);
     };
 
     return true;
