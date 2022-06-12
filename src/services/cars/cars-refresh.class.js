@@ -13,6 +13,8 @@ exports.CarsRefresh = class CarsRefresh {
     const {data} = await axios.get('https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag');
 
     for (let item of data) {
+      item.auction_date = new Date(item.auction_date);
+
       let res = await this.model.findOneAndUpdate({'lot_id': item.lot_id}, item);
 
       if (!res) this.model.create(item);
