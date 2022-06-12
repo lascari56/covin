@@ -28,6 +28,5 @@
       "passwordField": "password"
     }
   },
-  // "mongodb": "mongodb+srv://root:Victor565758!@cluster0.waajg.mongodb.net/?retryWrites=true&w=majority"
-  "mongodb": "mongodb+srv://root:victor565758@cluster0.gu8lf.mongodb.net/?retryWrites=true&w=majority",
+  "mongodb": "mongodb+srv://root:victor565758@cluster0.gu8lf.mongodb.net/?retryWrites=true&w=majority"
 }
