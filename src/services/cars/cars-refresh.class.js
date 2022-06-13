@@ -42,7 +42,7 @@ exports.CarsRefresh = class CarsRefresh {
     await this.model.deleteMany({lot_id: {$in: endLotsIds}});
 
     for (let item of lots) {
-      item.auction_date = item.auction_date ? moment(item.auction_date).toDate() : null;
+      item.auction_date = item.auction_date ? moment(item.auction_date).unix() : null;
 
       let res = await this.model.findOneAndUpdate({'lot_id': item.lot_id}, item);
 
@@ -56,7 +56,7 @@ exports.CarsRefresh = class CarsRefresh {
     return await axios.get('https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag').then((res) => {
       return res.data;
     }).catch(async (e) => {
-      return this.getLots(true);
+      return await this.getLots();
     });
   }
 
@@ -64,7 +64,7 @@ exports.CarsRefresh = class CarsRefresh {
     return await axios.get('https://vmi423304.contaboserver.net/API/api2_1_iaai_copart_sold_lots.php?api_key=E5nH1rkFKQ8Xr38mPag').then((res) => {
       return res.data;
     }).catch(async (e) => {
-      return this.getLots(true);
+      return await this.getLotsSelled();
     });
   }
 };
