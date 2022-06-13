@@ -14,9 +14,11 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async find () {
-    const lots = await axios.get('https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag');
-    const selledLots = await axios.get('https://vmi423304.contaboserver.net/API/api2_1_iaai_copart_sold_lots.php?api_key=E5nH1rkFKQ8Xr38mPag');
-    const selledLotIds = selledLots.data.map((item) => item.lot_id);
+    const lots = await this.getLots();
+
+    const selledLots = await this.getLotsSelled();
+
+    const selledLotIds = selledLots.map((item) => item.lot_id);
 
     const endLots = await this.model.find({
       $or: [
@@ -39,14 +41,30 @@ exports.CarsRefresh = class CarsRefresh {
 
     await this.model.deleteMany({lot_id: {$in: endLotsIds}});
 
-    for (let item of lots?.data) {
+    for (let item of lots) {
       item.auction_date = item.auction_date ? moment(item.auction_date).toDate() : null;
-      
+
       let res = await this.model.findOneAndUpdate({'lot_id': item.lot_id}, item);
 
       if (!res && endLotsIds.indexOf(item.lot_id) === -1 && selledLotIds.indexOf(item.lot_id) === -1) this.model.create(item);
     };
 
     return {"status": true};
+  }
+
+  async getLots() {
+    return await axios.get('https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag').then((res) => {
+      return res.data;
+    }).catch(async (e) => {
+      return this.getLots(true);
+    });
+  }
+
+  async getLotsSelled() {
+    return await axios.get('https://vmi423304.contaboserver.net/API/api2_1_iaai_copart_sold_lots.php?api_key=E5nH1rkFKQ8Xr38mPag').then((res) => {
+      return res.data;
+    }).catch(async (e) => {
+      return this.getLots(true);
+    });
   }
 };
