@@ -19,6 +19,7 @@ module.exports = function (app) {
     "cost_repair": {type: Number},
     "year": { type: String },
     "auction_date": { type: Number },
+    "auction_date_api": { type: String },
     "cylinders": {type: String},
     "state": { type: String },
     "vehicle_type": { type: String },
