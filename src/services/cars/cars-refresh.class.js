@@ -42,6 +42,7 @@ exports.CarsRefresh = class CarsRefresh {
     await this.model.deleteMany({lot_id: {$in: endLotsIds}});
 
     for (let item of lots) {
+      item.auction_date_api = item.auction_date;
       item.auction_date = item.auction_date ? moment(item.auction_date).unix() : null;
 
       let res = await this.model.findOneAndUpdate({'lot_id': item.lot_id}, item);

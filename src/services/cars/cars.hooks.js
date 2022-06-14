@@ -36,6 +36,7 @@ module.exports = {
             cost_repair: {},
             location: {},
             document: {},
+            site: {},
           };
 
           const model = createModel(context.app);
