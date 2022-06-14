@@ -48,6 +48,8 @@ module.exports = function (app) {
     timestamps: true
   });
 
+  schema.index({title: 'text'});
+
   // This is necessary to avoid model compilation errors in watch mode
   // see https://mongoosejs.com/docs/api/connection.html#connection_Connection-deleteModel
   if (mongooseClient.modelNames().includes(modelName)) {

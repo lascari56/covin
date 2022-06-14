@@ -1,11 +1,21 @@
 const { authenticate } = require('@feathersjs/authentication').hooks;
+const search = require('feathers-mongodb-fuzzy-search');
 
 const createModel = require('../../models/cars.model');
 
 module.exports = {
   before: {
-    // all: [ authenticate('jwt') ],
-    find: [],
+    all: [
+      // authenticate('jwt')
+      // search({  // regex search on given fields
+      //   fields: ['title']
+      // })
+    ],
+    find: [
+      search({  // regex search on given fields
+        fields: ['title']
+      })
+    ],
     get: [],
     create: [],
     update: [],
