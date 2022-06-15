@@ -58,8 +58,9 @@ module.exports = {
               if (filters[key][item[key]]) filters[key][item[key]].count += 1;
               else filters[key][item[key]] = {count: 1}
 
-              if (key === 'model') filters[key][item[key]].make = item.make;
-              else if (key === 'series') filters[key][item[key]].model = item.model;
+              if (key === 'model' || key === 'series') {
+                filters[key][item[key]] = {...filters[key][item[key]], make: item.make, model: item.model};
+              }
             }
           }
 
