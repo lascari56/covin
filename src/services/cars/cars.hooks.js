@@ -53,25 +53,23 @@ module.exports = {
 
           const data = await model.find();
 
-          console.log('====================================');
-          console.log("data", data[0]?.make);
-          console.log('====================================');
-
           for (let item of data) {
             for (let filter of Object.keys(filters)) {
               let key = null;
 
-
-              if (filter === 'model') key = `${item.make}|${item.model}`;
-              else if (filter === 'series') key = `${item.make}|${item.model}|${item.series}`;
+              if (filter === 'model') key = `${item.make}`;
+              else if (filter === 'series') key = `${item.make}|${item.model}`;
               else key = item[filter];
 
-              if (filters[filter][key]) filters[filter][key].count += 1;
-              else filters[filter][key] = {count: 1};
+              if (!filters[filter][key]) filters[filter][key] = {};
 
-              // if (filter === 'model' || filter === 'series') {
-              //   filters[key][item[filter]] = {...filters[key][item[filter]], make: item.make, model: item.model};
-              // }
+              if (filter === 'model' || filter === 'series') {
+                if (filters[filter][key][item[filter]]) filters[filter][key][item[filter]].count += 1;
+                else filters[filter][key][item[filter]] = {count: 1};
+              } else {
+                if (filters[filter][key].count) filters[filter][key].count += 1;
+                else filters[filter][key] = {count: 1};
+              }
             }
           }
 
