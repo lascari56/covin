@@ -55,8 +55,11 @@ module.exports = {
 
           for (let item of data) {
             for (let key of Object.keys(filters)) {
-              if (filters[key][item[key]]) filters[key][item[key]] += 1;
-              else filters[key][item[key]] = 1;
+              if (filters[key][item[key]]) filters[key][item[key]].count += 1;
+              else filters[key][item[key]] = {count: 1}
+
+              if (key === 'model') filters[key][item[key]].make = item.make;
+              else if (key === 'series') filters[key][item[key]].model = item.model;
             }
           }
 
