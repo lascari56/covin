@@ -2,6 +2,7 @@ const { Service } = require('feathers-mongoose');
 
 const createModel = require('../../models/cars.model');
 const createModelHistoryCars = require('../../models/history-cars.model');
+const createModelCarFilters = require('../../models/car-filters.model');
 
 const axios = require('axios').default;
 const moment = require('moment');
@@ -10,6 +11,7 @@ exports.CarsRefresh = class CarsRefresh {
   setup(app) {
     this.model = createModel(app);
     this.modelHistoryCars = createModelHistoryCars(app);
+    this.modelCarFilters = createModelCarFilters(app);
     this.app = app;
   }
 
@@ -50,6 +52,8 @@ exports.CarsRefresh = class CarsRefresh {
       if (!res && endLotsIds.indexOf(item.lot_id) === -1 && selledLotIds.indexOf(item.lot_id) === -1) this.model.create(item);
     };
 
+    await this.saveLotFilters();
+
     return {"status": true};
   }
 
@@ -67,5 +71,56 @@ exports.CarsRefresh = class CarsRefresh {
     }).catch(async (e) => {
       return await this.getLotsSelled();
     });
+  }
+
+  async saveLotFilters() {
+    let filters = {
+      make: {},
+      model: {},
+      series: {},
+      year: {},
+      odometer: {},
+      loss: {},
+      damage_pr: {},
+      damage_sec: {},
+      drive: {},
+      status: {},
+      keys: {},
+      transmission: {},
+      engine: {},
+      fuel: {},
+      cost_repair: {},
+      location: {},
+      document: {},
+      site: {},
+    };
+
+    const data = await this.model.find();
+
+    for (let item of data) {
+      for (let filter of Object.keys(filters)) {
+        let key = null;
+
+        if (filter === 'model') key = `${item.make}`;
+        else if (filter === 'series') key = `${item.make}|${item.model}`;
+        else key = item[filter];
+
+        if (!filters[filter][key]) filters[filter][key] = {};
+
+        if (filter === 'model' || filter === 'series') {
+          if (filters[filter][key][item[filter]]) filters[filter][key][item[filter]].count += 1;
+          else filters[filter][key][item[filter]] = {count: 1};
+        } else {
+          if (filters[filter][key].count) filters[filter][key].count += 1;
+          else filters[filter][key] = {count: 1};
+        }
+      }
+    }
+
+    let res = await this.modelCarFilters.findOneAndUpdate({}, filters);
+
+    if (!res) await this.modelCarFilters.create(filters);
+
+    return true;
   }
 };
