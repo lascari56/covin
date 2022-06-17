@@ -16,6 +16,8 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async find () {
+    return {"status": true};
+
     const lots = await this.getLots();
 
     const selledLots = await this.getLotsSelled();
@@ -78,8 +80,8 @@ exports.CarsRefresh = class CarsRefresh {
       make: {},
       model: {},
       series: {},
-      year: {},
-      odometer: {},
+      // year: {},
+      // odometer: {},
       loss: {},
       damage_pr: {},
       damage_sec: {},
@@ -89,7 +91,7 @@ exports.CarsRefresh = class CarsRefresh {
       transmission: {},
       engine: {},
       fuel: {},
-      cost_repair: {},
+      // cost_repair: {},
       location: {},
       document: {},
       site: {},
@@ -123,4 +125,18 @@ exports.CarsRefresh = class CarsRefresh {
 
     return true;
   }
+
+  // async updateData() {
+  //   let data = await this.model.find();
+
+  //   let coincidences = {
+  //     loss: {
+
+  //     }
+  //   }
+
+  //   for (let item of data) {
+
+  //   }
+  // }
 };
