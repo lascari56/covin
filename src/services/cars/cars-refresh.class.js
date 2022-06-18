@@ -16,7 +16,7 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async find () {
-    return {"status": true};
+    // return {"status": true};
 
     const lots = await this.getLots();
 
