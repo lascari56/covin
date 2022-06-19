@@ -1,9 +1,28 @@
 const { Service } = require('feathers-mongoose');
 
-exports.Cars = class Cars extends Service {
-  async find (data, params) {
-    console.log("params", params);
+const createModel = require('../../models/cars.model');
 
-    return await super.find(data, params);
+exports.Cars = class Cars extends Service {
+  setup(app) {
+    this.model = createModel(app);
+    this.app = app;
   }
+
+  // async find (data, params) {
+  //   console.log("params", params);
+
+  //   // return [];
+
+  //   return await this.model.find({}).sort({"auction_date_api" : 1}).limit(10).skip(3000 * 10).allowDiskUse(true);
+
+
+
+  //   // return await super.find({query: {
+  //   //   $limit: 10,
+  //   //   $sort: {
+  //   //     "auction_date_api": 1
+  //   //   },
+  //   //   $skip: 17000 * 10,
+  //   // }});
+  // }
 };
