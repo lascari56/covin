@@ -19,7 +19,7 @@ exports.CarsRefresh = class CarsRefresh {
 
     // const res = await this.model.find();
 
-    // return {"status": true};
+    return {"status": true};
 
     const lots = await this.getLots();
 
