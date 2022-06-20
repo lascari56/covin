@@ -8,21 +8,12 @@ exports.Cars = class Cars extends Service {
     this.app = app;
   }
 
-  // async find (data, params) {
-  //   console.log("params", params);
-
-  //   // return [];
-
-  //   return await this.model.find({}).sort({"auction_date_api" : 1}).limit(10).skip(3000 * 10).allowDiskUse(true);
-
-
-
-  //   // return await super.find({query: {
-  //   //   $limit: 10,
-  //   //   $sort: {
-  //   //     "auction_date_api": 1
-  //   //   },
-  //   //   $skip: 17000 * 10,
-  //   // }});
-  // }
+  async find (data, params) {
+    return await super.find({
+      query: data?.query,
+      queryModifier: (query, params) => {
+        query.allowDiskUse();
+      }
+    });
+  }
 };

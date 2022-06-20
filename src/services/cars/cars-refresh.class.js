@@ -19,7 +19,7 @@ exports.CarsRefresh = class CarsRefresh {
 
     // const res = await this.model.find();
 
-    return {"status": true};
+    // return {"status": true};
 
     const lots = await this.getLots();
 
@@ -27,26 +27,26 @@ exports.CarsRefresh = class CarsRefresh {
 
     const selledLotIds = selledLots.map((item) => item.lot_id);
 
-    const endLots = await this.model.find({
-      $or: [
-        {
-          auction_date: {
-            $lte: moment().subtract(3, 'hours').unix(),
-          }
-        },
-        {
-          lot_id: {
-            $in: selledLotIds,
-          }
-        }
-      ],
-    });
+    // const endLots = await this.model.find({
+    //   $or: [
+    //     {
+    //       auction_date: {
+    //         $lte: moment().subtract(3, 'hours').unix(),
+    //       }
+    //     },
+    //     {
+    //       lot_id: {
+    //         $in: selledLotIds,
+    //       }
+    //     }
+    //   ],
+    // });
 
-    const endLotsIds = endLots.map((item) => item.lot_id);
+    // const endLotsIds = endLots.map((item) => item.lot_id);
 
-    await this.modelHistoryCars.insertMany(endLots);
+    // await this.modelHistoryCars.insertMany(endLots);
 
-    await this.model.deleteMany({lot_id: {$in: endLotsIds}});
+    // await this.model.deleteMany({lot_id: {$in: endLotsIds}});
 
     for (let item of lots) {
       item.auction_date_api = item.auction_date;
@@ -54,7 +54,9 @@ exports.CarsRefresh = class CarsRefresh {
 
       let res = await this.model.findOneAndUpdate({'lot_id': item.lot_id}, item);
 
-      if (!res && endLotsIds.indexOf(item.lot_id) === -1 && selledLotIds.indexOf(item.lot_id) === -1) this.model.create(item);
+      if (!res && selledLotIds.indexOf(item.lot_id) === -1) this.model.create(item);
+
+      // if (!res && endLotsIds.indexOf(item.lot_id) === -1 && selledLotIds.indexOf(item.lot_id) === -1) this.model.create(item);
     };
 
     await this.saveLotFilters();
@@ -100,21 +102,36 @@ exports.CarsRefresh = class CarsRefresh {
       site: {},
     };
 
-    const data = await this.model.find();
+    for (let filter of Object.keys(filters)) {
+      // let
 
-    for (let item of data) {
-      for (let filter of Object.keys(filters)) {
+      let data = await this.model.aggregate([
+        {
+          $group:
+          {
+            _id: {
+              make: "$make",
+              model: "$model",
+              series: "$series",
+              [filter]: `$${filter}`
+            },
+            count: { $sum: 1 },
+          },
+        },
+      ]);
+
+      for (let item of data) {
         let key = null;
 
-        if (filter === 'model') key = `${item.make}`;
-        else if (filter === 'series') key = `${item.make}|${item.model}`;
-        else key = item[filter];
+        if (filter === 'model') key = `${item._id.make}`;
+        else if (filter === 'series') key = `${item._id.make}|${item._id.model}`;
+        else key = item._id[filter];
 
         if (!filters[filter][key]) filters[filter][key] = {};
 
         if (filter === 'model' || filter === 'series') {
-          if (filters[filter][key][item[filter]]) filters[filter][key][item[filter]].count += 1;
-          else filters[filter][key][item[filter]] = {count: 1};
+          if (filters[filter][key][item._id[filter]]) filters[filter][key][item._id[filter]].count += 1;
+          else filters[filter][key][item._id[filter]] = {count: 1};
         } else {
           if (filters[filter][key].count) filters[filter][key].count += 1;
           else filters[filter][key] = {count: 1};
