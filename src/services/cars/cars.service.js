@@ -9,7 +9,7 @@ module.exports = function (app) {
     Model: createModel(app),
     paginate: app.get('paginate'),
     lean: true,
-    whitelist: ['$text','$search', '$regex', '$allowDiskUse']
+    whitelist: ['$text','$search', '$regex']
   };
 
   // Initialize our service with any options it requires
