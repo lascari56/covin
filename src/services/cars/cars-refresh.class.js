@@ -73,7 +73,7 @@ exports.CarsRefresh = class CarsRefresh {
       await this.saveLotFilters();
 
       await this.modelLogs.create({
-        message: `All count: ${lots.length}, updated: ${statistics.update}, added: ${statistics.add}`,
+        message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Total: ${statistics.update + statistics.add}`,
         status: 'Success',
       });
 
