@@ -3,6 +3,7 @@ const { Service } = require('feathers-mongoose');
 const createModel = require('../../models/cars.model');
 const createModelHistoryCars = require('../../models/history-cars.model');
 const createModelCarFilters = require('../../models/car-filters.model');
+const createModelLogs = require('../../models/logs.model');
 
 const axios = require('axios').default;
 const moment = require('moment');
@@ -12,56 +13,79 @@ exports.CarsRefresh = class CarsRefresh {
     this.model = createModel(app);
     this.modelHistoryCars = createModelHistoryCars(app);
     this.modelCarFilters = createModelCarFilters(app);
+    this.modelLogs = createModelLogs(app);
     this.app = app;
   }
 
   async find () {
+    try {
+      const lots = await this.getLots();
 
-    // const res = await this.model.find();
+      const selledLots = await this.getLotsSelled();
 
-    return {"status": true};
+      const selledLotIds = selledLots.map((item) => item.lot_id);
 
-    const lots = await this.getLots();
+      const endLots = await this.model.find({
+        $or: [
+          {
+            auction_date: {
+              $lte: moment().subtract(3, 'hours').unix(),
+            }
+          },
+          {
+            lot_id: {
+              $in: selledLotIds,
+            }
+          }
+        ],
+      }).select("lot_id").allowDiskUse(true);
 
-    const selledLots = await this.getLotsSelled();
+      const endLotsIds = endLots.map((item) => item.lot_id);
 
-    const selledLotIds = selledLots.map((item) => item.lot_id);
+      // return {"status": endLots.length};
 
-    // const endLots = await this.model.find({
-    //   $or: [
-    //     {
-    //       auction_date: {
-    //         $lte: moment().subtract(3, 'hours').unix(),
-    //       }
-    //     },
-    //     {
-    //       lot_id: {
-    //         $in: selledLotIds,
-    //       }
-    //     }
-    //   ],
-    // });
+      await this.modelHistoryCars.insertMany(endLots);
 
-    // const endLotsIds = endLots.map((item) => item.lot_id);
+      await this.model.deleteMany({lot_id: {$in: endLotsIds}});
 
-    // await this.modelHistoryCars.insertMany(endLots);
+      const statistics = {
+        update: 0,
+        add: 0
+      };
 
-    // await this.model.deleteMany({lot_id: {$in: endLotsIds}});
+      for (let item of lots) {
+        let _item = item;
 
-    for (let item of lots) {
-      item.auction_date_api = item.auction_date;
-      item.auction_date = item.auction_date ? moment(item.auction_date).unix() : null;
+        _item.auction_date_api = item.auction_date;
+        _item.auction_date = item.auction_date ? moment(item.auction_date).unix() : null;
 
-      let res = await this.model.findOneAndUpdate({'lot_id': item.lot_id}, item);
+        let res = await this.model.findOneAndUpdate({'lot_id': item.lot_id}, item);
 
-      if (!res && selledLotIds.indexOf(item.lot_id) === -1) this.model.create(item);
+        if (!!res) statistics.update += 1;
 
-      // if (!res && endLotsIds.indexOf(item.lot_id) === -1 && selledLotIds.indexOf(item.lot_id) === -1) this.model.create(item);
-    };
+        if (!res && endLotsIds.indexOf(item.lot_id) === -1 && selledLotIds.indexOf(item.lot_id) === -1) {
+          await this.model.create(item);
 
-    await this.saveLotFilters();
+          statistics.add += 1;
+        }
+      };
 
-    return {"status": true};
+      await this.saveLotFilters();
+
+      await this.modelLogs.create({
+        message: `All count: ${lots.length}, updated: ${statistics.update}, added: ${statistics.add}`,
+        status: 'Success',
+      });
+
+      return {"status": true};
+    } catch (error) {
+      await this.modelLogs.create({
+        message: `${error}`,
+        status: 'Error',
+      });
+
+      return {"status": false};
+    }
   }
 
   async getLots() {

@@ -29,5 +29,4 @@
     }
   },
   "mongodb": "mongodb+srv://t1oln9Q1btGimmGN:t1oln9Q1btGimmGN@cluster0.cco3s.mongodb.net/?retryWrites=true&w=majority"
-  // "mongodb": "mongodb+srv://root:victor565758@cluster0.gu8lf.mongodb.net/?retryWrites=true&w=majority"
 }
