@@ -8,8 +8,8 @@ module.exports = function (app) {
   const options = {
     Model: createModel(app),
     paginate: {
-      default: 100,
-      max: 100
+      default: 20,
+      max: 20
     },
     whitelist: ['$text','$search', '$regex']
   };
