@@ -19,6 +19,7 @@ module.exports = function (app) {
     "cost_repair": {type: Number},
     "year": { type: String },
     "auction_date": { type: Number },
+    "auction_date_api": { type: String },
     "cylinders": {type: String},
     "state": { type: String },
     "vehicle_type": { type: String },
@@ -46,6 +47,10 @@ module.exports = function (app) {
   }, {
     timestamps: true
   });
+
+  schema.index(
+    { lot_id: 1 },
+  );
 
   // This is necessary to avoid model compilation errors in watch mode
   // see https://mongoosejs.com/docs/api/connection.html#connection_Connection-deleteModel

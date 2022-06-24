@@ -48,7 +48,25 @@ module.exports = function (app) {
     timestamps: true
   });
 
-  schema.index({title: 'text'});
+  schema.index(
+    { title: 'text', lot_id: 'text', vin: 'text' },
+    { year: 1 },
+    { odometr: 1 },
+    { cost_repair: 1 },
+    { damage_pr: 1, damage_sec: 1 },
+    { make: 1 },
+    { loss: 1 },
+    { drive: 1 },
+    { status: 1 },
+    { keys: 1 },
+    { transmission: 1 },
+    { engine: 1 },
+    { fuel: 1 },
+    { location: 1 },
+    { document: 1 },
+    { site: 1 },
+    { lot_id: 1 },
+  );
 
   // This is necessary to avoid model compilation errors in watch mode
   // see https://mongoosejs.com/docs/api/connection.html#connection_Connection-deleteModel

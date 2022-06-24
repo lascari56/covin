@@ -13,7 +13,7 @@ module.exports = {
     ],
     find: [
       search({
-        fields: ['title']
+        fields: ['title', 'lot_id', 'vin']
       })
     ],
     get: [],
