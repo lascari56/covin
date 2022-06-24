@@ -8,7 +8,6 @@ module.exports = function (app) {
   const options = {
     Model: createModel(app),
     paginate: app.get('paginate'),
-    lean: true,
     whitelist: ['$text','$search', '$regex']
   };
 
