@@ -7,7 +7,10 @@ const hooks = require('./cars.hooks');
 module.exports = function (app) {
   const options = {
     Model: createModel(app),
-    paginate: app.get('paginate'),
+    paginate: {
+      default: 100,
+      max: 100
+    },
     whitelist: ['$text','$search', '$regex']
   };
 
