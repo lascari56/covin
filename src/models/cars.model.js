@@ -66,6 +66,9 @@ module.exports = function (app) {
     { document: 1 },
     { site: 1 },
     { lot_id: 1 },
+    { auction_date: 1 },
+    { date_adding_new: 1 },
+    { date_adding_old: 1 },
   );
 
   // This is necessary to avoid model compilation errors in watch mode
