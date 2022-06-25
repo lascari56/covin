@@ -18,11 +18,25 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async find () {
+    // return new Date().getTime();
+
+    // let data = await this.model.aggregate([
+    //   {
+    //     $group:
+    //     {
+    //       _id: {
+    //         auction_date: "$auction_date",
+    //       },
+    //       count: { $sum: 1 },
+    //     },
+    //   },
+    // ]);
+
+    // console.log("data", data);
+
+    // return;
+
     try {
-      // await this.saveLotFilters();
-
-      return true;
-
       const lots = await this.getLots();
 
       const selledLots = await this.getLotsSelled();
@@ -62,6 +76,7 @@ exports.CarsRefresh = class CarsRefresh {
 
         _item.auction_date_api = item.auction_date;
         _item.auction_date = item.auction_date ? moment(item.auction_date).unix() : null;
+        _item.auction_date_known = !!item.auction_date;
 
         let res = await this.model.findOneAndUpdate({'lot_id': item.lot_id}, item);
 
@@ -109,88 +124,67 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async saveLotFilters() {
+    let filters = {
+      make: {},
+      model: {},
+      series: {},
+      // year: {},
+      // odometer: {},
+      loss: {},
+      damage_pr: {},
+      damage_sec: {},
+      drive: {},
+      status: {},
+      keys: {},
+      transmission: {},
+      engine: {},
+      fuel: {},
+      // cost_repair: {},
+      location: {},
+      document: {},
+      site: {},
+    };
 
-    let data = await this.model.aggregate([
-      {
-        $group:
+    for (let filter of Object.keys(filters)) {
+      let data = await this.model.aggregate([
         {
-          _id: {
-            auction_date: "$auction_date",
-            // make: "$make",
-            // model: "$model",
-            // series: "$series",
-            // [filter]: `$${filter}`
+          $group:
+          {
+            _id: {
+              make: "$make",
+              model: "$model",
+              series: "$series",
+              [filter]: `$${filter}`
+            },
+            count: { $sum: 1 },
           },
-          count: { $sum: 1 },
         },
-      },
-    ]);
+      ]);
 
-    console.log("data", JSON.stringify(data));
+      for (let item of data) {
+        let key = null;
+
+        if (filter === 'model') key = `${item._id.make}`;
+        else if (filter === 'series') key = `${item._id.make}|${item._id.model}`;
+        else key = item._id[filter];
+
+        if (!filters[filter][key]) filters[filter][key] = {};
+
+        if (filter === 'model' || filter === 'series') {
+          if (filters[filter][key][item._id[filter]]) filters[filter][key][item._id[filter]].count += 1;
+          else filters[filter][key][item._id[filter]] = {count: 1};
+        } else {
+          if (filters[filter][key].count) filters[filter][key].count += 1;
+          else filters[filter][key] = {count: 1};
+        }
+      }
+    }
+
+    let res = await this.modelCarFilters.findOneAndUpdate({}, filters);
+
+    if (!res) await this.modelCarFilters.create(filters);
 
     return true;
-
-    // let filters = {
-    //   make: {},
-    //   model: {},
-    //   series: {},
-    //   // year: {},
-    //   // odometer: {},
-    //   loss: {},
-    //   damage_pr: {},
-    //   damage_sec: {},
-    //   drive: {},
-    //   status: {},
-    //   keys: {},
-    //   transmission: {},
-    //   engine: {},
-    //   fuel: {},
-    //   // cost_repair: {},
-    //   location: {},
-    //   document: {},
-    //   site: {},
-    // };
-
-    // for (let filter of Object.keys(filters)) {
-    //   let data = await this.model.aggregate([
-    //     {
-    //       $group:
-    //       {
-    //         _id: {
-    //           make: "$make",
-    //           model: "$model",
-    //           series: "$series",
-    //           [filter]: `$${filter}`
-    //         },
-    //         count: { $sum: 1 },
-    //       },
-    //     },
-    //   ]);
-
-    //   for (let item of data) {
-    //     let key = null;
-
-    //     if (filter === 'model') key = `${item._id.make}`;
-    //     else if (filter === 'series') key = `${item._id.make}|${item._id.model}`;
-    //     else key = item._id[filter];
-
-    //     if (!filters[filter][key]) filters[filter][key] = {};
-
-    //     if (filter === 'model' || filter === 'series') {
-    //       if (filters[filter][key][item._id[filter]]) filters[filter][key][item._id[filter]].count += 1;
-    //       else filters[filter][key][item._id[filter]] = {count: 1};
-    //     } else {
-    //       if (filters[filter][key].count) filters[filter][key].count += 1;
-    //       else filters[filter][key] = {count: 1};
-    //     }
-    //   }
-    // }
-
-    // let res = await this.modelCarFilters.findOneAndUpdate({}, filters);
-
-    // if (!res) await this.modelCarFilters.create(filters);
-
-    // return true;
   }
 
   // async updateData() {
