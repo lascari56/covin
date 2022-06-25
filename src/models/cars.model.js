@@ -20,6 +20,7 @@ module.exports = function (app) {
     "year": { type: String },
     "auction_date": { type: Number },
     "auction_date_api": { type: String },
+    "auction_date_known": { type: Boolean },
     "cylinders": {type: String},
     "state": { type: String },
     "vehicle_type": { type: String },
@@ -66,7 +67,9 @@ module.exports = function (app) {
     { document: 1 },
     { site: 1 },
     { lot_id: 1 },
+    { auction_date_api: 1 },
     { auction_date: 1 },
+    { auction_date_known: 1 },
     { date_adding_new: 1 },
     { date_adding_old: 1 },
   );
