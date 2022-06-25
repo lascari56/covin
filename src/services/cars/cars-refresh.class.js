@@ -19,6 +19,10 @@ exports.CarsRefresh = class CarsRefresh {
 
   async find () {
     try {
+      // await this.saveLotFilters();
+
+      return true;
+
       const lots = await this.getLots();
 
       const selledLots = await this.getLotsSelled();
@@ -105,69 +109,88 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async saveLotFilters() {
-    let filters = {
-      make: {},
-      model: {},
-      series: {},
-      // year: {},
-      // odometer: {},
-      loss: {},
-      damage_pr: {},
-      damage_sec: {},
-      drive: {},
-      status: {},
-      keys: {},
-      transmission: {},
-      engine: {},
-      fuel: {},
-      // cost_repair: {},
-      location: {},
-      document: {},
-      site: {},
-    };
 
-    for (let filter of Object.keys(filters)) {
-      // let
-
-      let data = await this.model.aggregate([
+    let data = await this.model.aggregate([
+      {
+        $group:
         {
-          $group:
-          {
-            _id: {
-              make: "$make",
-              model: "$model",
-              series: "$series",
-              [filter]: `$${filter}`
-            },
-            count: { $sum: 1 },
+          _id: {
+            auction_date: "$auction_date",
+            // make: "$make",
+            // model: "$model",
+            // series: "$series",
+            // [filter]: `$${filter}`
           },
+          count: { $sum: 1 },
         },
-      ]);
+      },
+    ]);
 
-      for (let item of data) {
-        let key = null;
-
-        if (filter === 'model') key = `${item._id.make}`;
-        else if (filter === 'series') key = `${item._id.make}|${item._id.model}`;
-        else key = item._id[filter];
-
-        if (!filters[filter][key]) filters[filter][key] = {};
-
-        if (filter === 'model' || filter === 'series') {
-          if (filters[filter][key][item._id[filter]]) filters[filter][key][item._id[filter]].count += 1;
-          else filters[filter][key][item._id[filter]] = {count: 1};
-        } else {
-          if (filters[filter][key].count) filters[filter][key].count += 1;
-          else filters[filter][key] = {count: 1};
-        }
-      }
-    }
-
-    let res = await this.modelCarFilters.findOneAndUpdate({}, filters);
-
-    if (!res) await this.modelCarFilters.create(filters);
+    console.log("data", JSON.stringify(data));
 
     return true;
+
+    // let filters = {
+    //   make: {},
+    //   model: {},
+    //   series: {},
+    //   // year: {},
+    //   // odometer: {},
+    //   loss: {},
+    //   damage_pr: {},
+    //   damage_sec: {},
+    //   drive: {},
+    //   status: {},
+    //   keys: {},
+    //   transmission: {},
+    //   engine: {},
+    //   fuel: {},
+    //   // cost_repair: {},
+    //   location: {},
+    //   document: {},
+    //   site: {},
+    // };
+
+    // for (let filter of Object.keys(filters)) {
+    //   let data = await this.model.aggregate([
+    //     {
+    //       $group:
+    //       {
+    //         _id: {
+    //           make: "$make",
+    //           model: "$model",
+    //           series: "$series",
+    //           [filter]: `$${filter}`
+    //         },
+    //         count: { $sum: 1 },
+    //       },
+    //     },
+    //   ]);
+
+    //   for (let item of data) {
+    //     let key = null;
+
+    //     if (filter === 'model') key = `${item._id.make}`;
+    //     else if (filter === 'series') key = `${item._id.make}|${item._id.model}`;
+    //     else key = item._id[filter];
+
+    //     if (!filters[filter][key]) filters[filter][key] = {};
+
+    //     if (filter === 'model' || filter === 'series') {
+    //       if (filters[filter][key][item._id[filter]]) filters[filter][key][item._id[filter]].count += 1;
+    //       else filters[filter][key][item._id[filter]] = {count: 1};
+    //     } else {
+    //       if (filters[filter][key].count) filters[filter][key].count += 1;
+    //       else filters[filter][key] = {count: 1};
+    //     }
+    //   }
+    // }
+
+    // let res = await this.modelCarFilters.findOneAndUpdate({}, filters);
+
+    // if (!res) await this.modelCarFilters.create(filters);
+
+    // return true;
   }
 
   // async updateData() {
