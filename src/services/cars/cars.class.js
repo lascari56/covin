@@ -15,6 +15,16 @@ exports.Cars = class Cars extends Service {
       query.make = Object.values(query?.make)
     }
 
+    console.log("query", query);
+
+    // return [];
+
+    // return await this.app.service('cars').Model.aggregate([
+    //   { $sort : { auction_date_api: 1 } }
+    // ]).limit(10);
+
+    // return await this.app.service('cars').find({$limit: 10});
+
     return await super.find({
       query: query,
       queryModifier: (query, params) => {

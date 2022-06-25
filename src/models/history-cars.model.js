@@ -20,6 +20,7 @@ module.exports = function (app) {
     "year": { type: String },
     "auction_date": { type: Number },
     "auction_date_api": { type: String },
+    "auction_date_known": { type: Boolean },
     "cylinders": {type: String},
     "state": { type: String },
     "vehicle_type": { type: String },
