@@ -60,19 +60,19 @@ exports.CarsRefresh = class CarsRefresh {
 
       const endLotsIds = endLots.map((item) => item.lot_id);
 
-      // return {"status": endLots.length};
-
       await this.modelHistoryCars.insertMany(endLots);
 
       await this.model.deleteMany({lot_id: {$in: endLotsIds}});
 
       const statistics = {
         update: 0,
-        add: 0
+        add: 0,
+        copart: 0,
+        iaai: 0,
       };
 
       for (let item of lots) {
-        let _item = item;
+        let _item = {...item};
 
         _item.auction_date_api = item.auction_date;
         _item.auction_date = item.auction_date ? moment(item.auction_date).unix() : null;
@@ -81,6 +81,8 @@ exports.CarsRefresh = class CarsRefresh {
         let res = await this.model.findOneAndUpdate({'lot_id': item.lot_id}, item);
 
         if (!!res) statistics.update += 1;
+
+        statistics[item.site == '1' ? 'copart' : 'iaai'] += 1;
 
         if (!res && endLotsIds.indexOf(item.lot_id) === -1 && selledLotIds.indexOf(item.lot_id) === -1) {
           await this.model.create(item);
@@ -92,7 +94,7 @@ exports.CarsRefresh = class CarsRefresh {
       await this.saveLotFilters();
 
       await this.modelLogs.create({
-        message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Total: ${statistics.update + statistics.add}`,
+        message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}`,
         status: 'Success',
       });
 
@@ -108,9 +110,10 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async getLots() {
-    return await axios.get('https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag').then((res) => {
+    return await axios.get('https://vmi423304.contaboserver.net/API/1api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag').then((res) => {
       return res.data;
     }).catch(async (e) => {
+      console.log(e);
       return await this.getLots();
     });
   }
