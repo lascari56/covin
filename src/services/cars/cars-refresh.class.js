@@ -94,7 +94,7 @@ exports.CarsRefresh = class CarsRefresh {
       await this.saveLotFilters();
 
       await this.modelLogs.create({
-        message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}`,
+        message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}`,
         status: 'Success',
       });
 
@@ -110,7 +110,7 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async getLots() {
-    return await axios.get('https://vmi423304.contaboserver.net/API/1api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag').then((res) => {
+    return await axios.get('https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag').then((res) => {
       return res.data;
     }).catch(async (e) => {
       console.log(e);
