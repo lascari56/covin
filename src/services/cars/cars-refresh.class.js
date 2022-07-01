@@ -37,11 +37,13 @@ exports.CarsRefresh = class CarsRefresh {
     // return;
 
     try {
-      const lots = await this.getLots();
+      const lots = await this.getLots(true);
 
       const selledLots = await this.getLotsSelled();
 
       const selledLotIds = selledLots.map((item) => item.lot_id);
+
+      // return {data: lots};
 
       const endLots = await this.model.find({
         $or: [
@@ -98,7 +100,7 @@ exports.CarsRefresh = class CarsRefresh {
         status: 'Success',
       });
 
-      return {"status": true};
+      return {"status": true, "delete:": endLotsIds.length};
     } catch (error) {
       await this.modelLogs.create({
         message: `${error}`,
@@ -109,11 +111,13 @@ exports.CarsRefresh = class CarsRefresh {
     }
   }
 
-  async getLots() {
-    return await axios.get('https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag').then((res) => {
-      return res.data;
+  async getLots(retry) {
+    return await axios.get(`https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag`).then(async (res) => {
+      if (!res.data[0]) return res.data;
+      else {
+        return await this.getLots();
+      }
     }).catch(async (e) => {
-      console.log(e);
       return await this.getLots();
     });
   }
