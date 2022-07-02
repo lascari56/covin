@@ -111,12 +111,13 @@ exports.CarsRefresh = class CarsRefresh {
     }
   }
 
-  async getLots(retry) {
+  async getLots() {
     return await axios.get(`https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag`).then(async (res) => {
-      if (!res.data[0]) return res.data;
-      else {
-        return await this.getLots();
-      }
+      // if (!res.data[0]) return res.data;
+      // else {
+      //   return await this.getLots();
+      // }
+      return res.data;
     }).catch(async (e) => {
       return await this.getLots();
     });
