@@ -29,13 +29,12 @@ module.exports = function (app) {
     // reports: [{ type: mongooseClient.Types.ObjectId, ref: 'Report' }],
     // billings: [{ type: mongooseClient.Types.ObjectId, ref: 'Billing' }],
     resetPasswordToken: {
-        type: String,
-        required: false
+      type: String,
+      required: false
     },
-
     resetPasswordExpires: {
-        type: Date,
-        required: false
+      type: Date,
+      required: false
     }
   }, {
     timestamps: true
