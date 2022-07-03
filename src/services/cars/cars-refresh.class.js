@@ -7,6 +7,7 @@ const createModelLogs = require('../../models/logs.model');
 
 const axios = require('axios').default;
 const moment = require('moment');
+const fs = require('fs');
 
 exports.CarsRefresh = class CarsRefresh {
   setup(app) {
@@ -37,7 +38,9 @@ exports.CarsRefresh = class CarsRefresh {
     // return;
 
     try {
-      const lots = await this.getLots();
+      const {lots, fileName} = await this.getLots();
+
+      // return {lots, fileName: lots};
 
       const selledLots = await this.getLotsSelled();
 
@@ -98,29 +101,40 @@ exports.CarsRefresh = class CarsRefresh {
       await this.saveLotFilters();
 
       await this.modelLogs.create({
-        message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}`,
+        message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}, File name saved: ${fileName}`,
         status: lots.length === (statistics.update + statistics.add) ? 'Success' : 'Warning',
       });
 
       return {"status": true, "delete:": endLotsIds.length};
     } catch (error) {
-      await this.modelLogs.create({
-        message: `${error}`,
-        status: 'Error',
-      });
+      // await this.modelLogs.create({
+      //   message: `${error}`,
+      //   status: 'Error',
+      // });
+
+      console.log("11111", error);
 
       return {"status": false};
     }
   }
 
   async getLots() {
-    await axios.get(`https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag`).then((res) => {
+    return await axios.get(`https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag`).then((res) => {
       // if (!res.data[0]) return res.data;
       // else {
       //   return await this.getLots();
       // }
-      return res.data;
+
+      const fileName = moment().unix();
+
+      fs.writeFile(`storage/${fileName}.txt`, JSON.stringify(res.data), function (err) {
+        if (err) {console.log("file error", err)}
+        console.log('Saved!');
+      });
+
+      return {lots: typeof res.data === 'object' ? [] : res.data, fileName};
     }).catch(async (e) => {
+      console.log("eeee", e);
       return await this.getLots();
     });
   }
