@@ -6,7 +6,7 @@ const createModelCarFilters = require('../../models/car-filters.model');
 module.exports = {
   before: {
     all: [
-      // authenticate('jwt')
+      authenticate('jwt')
       // search({  // regex search on given fields
       //   fields: ['title']
       // })
