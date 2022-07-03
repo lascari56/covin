@@ -37,7 +37,7 @@ exports.CarsRefresh = class CarsRefresh {
     // return;
 
     try {
-      const lots = await this.getLots(true);
+      const lots = await this.getLots();
 
       const selledLots = await this.getLotsSelled();
 
@@ -82,14 +82,16 @@ exports.CarsRefresh = class CarsRefresh {
 
         let res = await this.model.findOneAndUpdate({'lot_id': item.lot_id}, item);
 
-        if (!!res) statistics.update += 1;
-
-        statistics[item.site == '1' ? 'copart' : 'iaai'] += 1;
+        if (!!res) {
+          statistics.update += 1;
+          statistics[item.site == '1' ? 'copart' : 'iaai'] += 1;
+        }
 
         if (!res && endLotsIds.indexOf(item.lot_id) === -1 && selledLotIds.indexOf(item.lot_id) === -1) {
           await this.model.create(item);
 
           statistics.add += 1;
+          statistics[item.site == '1' ? 'copart' : 'iaai'] += 1;
         }
       };
 
@@ -97,7 +99,7 @@ exports.CarsRefresh = class CarsRefresh {
 
       await this.modelLogs.create({
         message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}`,
-        status: 'Success',
+        status: lots.length === (statistics.update + statistics.add) ? 'Success' : 'Warning',
       });
 
       return {"status": true, "delete:": endLotsIds.length};
@@ -112,7 +114,7 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async getLots() {
-    return await axios.get(`https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag`).then(async (res) => {
+    await axios.get(`https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag`).then((res) => {
       // if (!res.data[0]) return res.data;
       // else {
       //   return await this.getLots();
