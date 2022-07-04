@@ -40,7 +40,7 @@ exports.CarsRefresh = class CarsRefresh {
     try {
       const {lots, fileName} = await this.getLots();
 
-      // return {lots, fileName: lots};
+      return {lots, fileName: lots};
 
       const selledLots = await this.getLotsSelled();
 
@@ -127,12 +127,12 @@ exports.CarsRefresh = class CarsRefresh {
 
       const fileName = moment().unix();
 
-      fs.writeFile(`storage/${fileName}.txt`, JSON.stringify(res.data), function (err) {
+      fs.writeFile(`./public/lots/${fileName}.txt`, JSON.stringify(res.data), function (err) {
         if (err) {console.log("file error", err)}
         console.log('Saved!');
       });
 
-      return {lots: typeof res.data === 'object' ? [] : res.data, fileName};
+      return {lots: typeof res.data !== 'object' || !res.data.length ? [] : res.data, fileName};
     }).catch(async (e) => {
       console.log("eeee", e);
       return await this.getLots();
