@@ -125,14 +125,20 @@ exports.CarsRefresh = class CarsRefresh {
       //   return await this.getLots();
       // }
 
+      let _res = res.data;
+
+      if (typeof _res !== 'object') _res = [];
+
+      if (!Array.isArray(_res)) _res = Object.values(_res);
+
       const fileName = moment().unix();
 
-      fs.writeFile(`./public/lots/${fileName}.txt`, JSON.stringify(res.data), function (err) {
+      fs.writeFile(`./public/lots/${fileName}.txt`, JSON.stringify(_res), function (err) {
         if (err) {console.log("file error", err)}
         console.log('Saved!');
       });
 
-      return {lots: typeof res.data !== 'object' || !res.data.length ? [] : res.data, fileName};
+      return {lots: _res, fileName};
     }).catch(async (e) => {
       console.log("eeee", e);
       return await this.getLots();
