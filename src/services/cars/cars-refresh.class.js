@@ -79,22 +79,22 @@ exports.CarsRefresh = class CarsRefresh {
       for (let item of lots) {
         let _item = {...item};
 
-        _item.auction_date_api = item.auction_date;
-        _item.auction_date = item.auction_date ? moment(item.auction_date).unix() : null;
-        _item.auction_date_known = !!item.auction_date;
+        _item.auction_date_api = _item.auction_date;
+        _item.auction_date = _item.auction_date ? moment(_item.auction_date).unix() : null;
+        _item.auction_date_known = !!_item.auction_date;
 
-        let res = await this.model.findOneAndUpdate({'lot_id': item.lot_id}, item);
+        let res = await this.model.findOneAndUpdate({'lot_id': _item.lot_id}, _item);
 
         if (!!res) {
           statistics.update += 1;
-          statistics[item.site == '1' ? 'copart' : 'iaai'] += 1;
+          statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
         }
 
-        if (!res && endLotsIds.indexOf(item.lot_id) === -1 && selledLotIds.indexOf(item.lot_id) === -1) {
-          await this.model.create(item);
+        if (!res && endLotsIds.indexOf(_item.lot_id) === -1 && selledLotIds.indexOf(_item.lot_id) === -1) {
+          await this.model.create(_item);
 
           statistics.add += 1;
-          statistics[item.site == '1' ? 'copart' : 'iaai'] += 1;
+          statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
         }
       };
 
