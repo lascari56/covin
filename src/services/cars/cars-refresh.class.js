@@ -40,7 +40,7 @@ exports.CarsRefresh = class CarsRefresh {
     try {
       const {lots, fileName} = await this.getLots();
 
-      return {lots, fileName: lots};
+      // return {lots, fileName: lots};
 
       const selledLots = await this.getLotsSelled();
 
