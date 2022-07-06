@@ -8,6 +8,7 @@ const createModelLogs = require('../../models/logs.model');
 const axios = require('axios').default;
 const moment = require('moment');
 const fs = require('fs');
+const { getBase64DataURI } = require('dauria');
 
 exports.CarsRefresh = class CarsRefresh {
   setup(app) {
@@ -19,6 +20,7 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async find () {
+
     // return new Date().getTime();
 
     // let data = await this.model.aggregate([
@@ -40,7 +42,7 @@ exports.CarsRefresh = class CarsRefresh {
     try {
       const {lots, fileName} = await this.getLots();
 
-      // return {lots, fileName: lots};
+      // return { fileName};
 
       const selledLots = await this.getLotsSelled();
 
@@ -120,11 +122,15 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async getLots() {
-    return await axios.get(`https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag`).then((res) => {
+    return await axios.get(`https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag`).then(async (res) => {
       // if (!res.data[0]) return res.data;
       // else {
       //   return await this.getLots();
       // }
+
+
+
+      // return {lots: {}, fileName: {}};
 
       let _res = res.data;
 
@@ -134,12 +140,50 @@ exports.CarsRefresh = class CarsRefresh {
 
       const fileName = moment().unix();
 
-      fs.writeFile(`./public/lots/${fileName}.txt`, JSON.stringify(_res), function (err) {
-        if (err) {console.log("file error", err)}
-        console.log('Saved!');
-      });
+      // c
 
-      return {lots: _res, fileName};
+      const blob = {
+        uri: getBase64DataURI(new Buffer(JSON.stringify(_res)), 'text/plain'),
+        ACL: 'public-read',
+        filename: `${fileName}.txt`
+      };
+
+      const blobService = this.app.service('upload');
+
+      // blobService.before({
+      //   create(hook) {
+      //     hook.params.s3 = { ACL: 'public-read' }; // makes uploaded files public
+      //   }
+      // });
+
+      const resFile = await blobService.create(blob, {
+        s3: { ACL: 'public-read' }
+      });
+      // .then(function (result) {
+      //   // console.log('Stored blob with id', result);
+      // }).catch(err => {
+      //   console.error(err);
+      // });
+
+      // console.log("resFile", resFile);
+
+      // let resFile = fs.writeFile(`./public/lots/${fileName}.txt`, JSON.stringify(_res), async (err, data) => {
+
+
+      //   if (err) {console.log("file error", err)}
+      //   else {
+      //     const service = await c.create({uri: `https://covin-dev.herokuapp.com/lots/${fileName}.txt}`});
+
+      //     console.log("service", service);
+
+      //     this.app.service('blobs').on('created', (file) => {
+      //       console.log('Received file created event!', file);
+      //   });
+      //   }
+      //   console.log('Saved!', data);
+      // });
+
+      return {lots: _res, fileName: resFile?.id};
     }).catch(async (e) => {
       console.log("eeee", e);
       return await this.getLots();
