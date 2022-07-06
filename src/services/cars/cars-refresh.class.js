@@ -90,7 +90,8 @@ exports.CarsRefresh = class CarsRefresh {
           statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
         }
 
-        if (!res && endLotsIds.indexOf(_item.lot_id) === -1 && selledLotIds.indexOf(_item.lot_id) === -1) {
+        // if (!res && endLotsIds.indexOf(_item.lot_id) === -1 && selledLotIds.indexOf(_item.lot_id) === -1) {
+        if (!res) {
           await this.model.create(_item);
 
           statistics.add += 1;
