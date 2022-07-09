@@ -17,6 +17,8 @@ exports.CarsRefresh = class CarsRefresh {
     this.modelCarFilters = createModelCarFilters(app);
     this.modelLogs = createModelLogs(app);
     this.app = app;
+    this.countError = 0;
+    this.fileName = null;
   }
 
   async find () {
@@ -37,12 +39,12 @@ exports.CarsRefresh = class CarsRefresh {
 
     // console.log("data", data);
 
-    // return;
+    // return {status: "true"};
 
     try {
-      const {lots, fileName} = await this.getLots();
+      const {lots, fileName} = await this.getLots(true);
 
-      // return { fileName};
+      // return { fileName };
 
       const selledLots = await this.getLotsSelled();
 
@@ -110,10 +112,11 @@ exports.CarsRefresh = class CarsRefresh {
 
       return {"status": true, "delete:": endLotsIds.length};
     } catch (error) {
-      // await this.modelLogs.create({
-      //   message: `${error}`,
-      //   status: 'Error',
-      // });
+
+      await this.modelLogs.create({
+        message: `${error}`,
+        status: 'Error',
+      });
 
       console.log("11111", error);
 
@@ -121,7 +124,7 @@ exports.CarsRefresh = class CarsRefresh {
     }
   }
 
-  async getLots() {
+  async getLots(retry) {
     return await axios.get(`https://vmi423304.contaboserver.net/API/api2_1_iaai_copart.php?api_key=E5nH1rkFKQ8Xr38mPag`).then(async (res) => {
       // if (!res.data[0]) return res.data;
       // else {
@@ -138,14 +141,16 @@ exports.CarsRefresh = class CarsRefresh {
 
       if (!Array.isArray(_res)) _res = Object.values(_res);
 
-      const fileName = moment().unix();
+      // const fileName = moment().unix();
+
+      // console.log("_res", _res);
 
       // c
 
       const blob = {
         uri: getBase64DataURI(new Buffer(JSON.stringify(_res)), 'text/plain'),
         ACL: 'public-read',
-        filename: `${fileName}.txt`
+        // filename: `${fileName}.txt`
       };
 
       const blobService = this.app.service('upload');
@@ -159,6 +164,8 @@ exports.CarsRefresh = class CarsRefresh {
       const resFile = await blobService.create(blob, {
         s3: { ACL: 'public-read' }
       });
+
+
       // .then(function (result) {
       //   // console.log('Stored blob with id', result);
       // }).catch(err => {
@@ -185,8 +192,17 @@ exports.CarsRefresh = class CarsRefresh {
 
       return {lots: _res, fileName: resFile?.id};
     }).catch(async (e) => {
+
       console.log("eeee", e);
+
       return await this.getLots();
+
+      // this.countError += 1;
+
+      // if (this.countError <= 3) {
+
+      //   return await this.getLots();
+      // } else return e.data;
     });
   }
 

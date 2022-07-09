@@ -19,6 +19,7 @@ module.exports = function (app) {
     price: {type: JSON, default: {carfax: null, autocheck: null, sticker: null}},
     token: {type: String},
     domain: {type: String},
+    googleId: {type: String},
     g_uid: {type: String},
     g_name: {type: String},
     registration_date: {type: Date, default: Date.now},

@@ -3,6 +3,8 @@ const cars = require('./cars/cars.service.js');
 const historyCars = require('./history-cars/history-cars.service.js');
 const logs = require('./logs/logs.service.js');
 const carFilters = require('./car-filters/car-filters.service.js');
+const templates = require('./templates/templates.service.js');
+const bynowTrackings = require('./bynow-trackings/bynow-trackings.service.js');
 // eslint-disable-next-line no-unused-vars
 module.exports = function (app) {
   app.configure(users);
@@ -10,4 +12,6 @@ module.exports = function (app) {
   app.configure(historyCars);
   app.configure(logs);
   app.configure(carFilters);
+  app.configure(templates);
+  app.configure(bynowTrackings);
 };
