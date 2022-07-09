@@ -12,7 +12,8 @@
     "secret": "NWXWJLM9gHsOkzzLoJ+jy0QdSlA=",
     "authStrategies": [
       "jwt",
-      "local"
+      "local",
+      "google"
     ],
     "jwtOptions": {
       "header": {
@@ -26,6 +27,15 @@
     "local": {
       "usernameField": "email",
       "passwordField": "password"
+    },
+    "oauth": {
+      "redirect": "http://localhost:3000",
+      "google": {
+        "key": "840337881721-37ng0ghf19cksi0flrsttjmncsen6k3e.apps.googleusercontent.com",
+        "secret": "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",
+        "scope": ["openid", "email"],
+        "nonce": true
+      }
     }
   },
   "mongodb": "mongodb+srv://t1oln9Q1btGimmGN:t1oln9Q1btGimmGN@cluster0.cco3s.mongodb.net/?retryWrites=true&w=majority"
