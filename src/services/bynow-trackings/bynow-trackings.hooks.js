@@ -3,9 +3,21 @@ const { authenticate } = require('@feathersjs/authentication').hooks;
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
-    find: [],
+    find: [async context => {
+      context.params.query = {
+        client: {
+          $in: context.params.user._id
+        }
+      };
+
+      return context;
+    }],
     get: [],
-    create: [],
+    create: [async context => {
+      context.data.client = context.params.user;
+
+      return context;
+    }],
     update: [],
     patch: [],
     remove: []
