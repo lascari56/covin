@@ -6,10 +6,10 @@ const hooks = require('./logs.hooks');
 module.exports = function (app) {
   const options = {
     Model: createModel(app),
-    paginate: app.get('paginate')
+    // paginate: app.get('paginate')
   };
 
-  let data = [];
+  // let data = [];
 
   // Initialize our service with any options it requires
   app.use('/logs', new Logs(options, app));

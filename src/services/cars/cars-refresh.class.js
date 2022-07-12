@@ -44,7 +44,10 @@ exports.CarsRefresh = class CarsRefresh {
     try {
       const {lots, fileName} = await this.getLots(true);
 
-      // return { fileName };
+      // const {lots, fileName} = await this.getLotsFile();
+
+
+      // return { fileName, lots };
 
       const selledLots = await this.getLotsSelled();
 
@@ -87,28 +90,31 @@ exports.CarsRefresh = class CarsRefresh {
         _item.auction_date = _item.auction_date ? moment(_item.auction_date).unix() : null;
         _item.auction_date_known = !!_item.auction_date;
 
-        let res = await this.model.findOneAndUpdate({'lot_id': _item.lot_id}, _item);
-
-        if (!!res) {
+        let res = await this.model.findOneAndUpdate({'lot_id': _item.lot_id}, _item).then(() => {
           statistics.update += 1;
           statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
-        }
+        })
+
+        // if (!!res) {
+        //   statistics.update += 1;
+        //   statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
+        // }
 
         // if (!res && endLotsIds.indexOf(_item.lot_id) === -1 && selledLotIds.indexOf(_item.lot_id) === -1) {
         if (!res) {
-          await this.model.create(_item);
-
-          statistics.add += 1;
-          statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
+          await this.model.create(_item).then(() => {
+            statistics.add += 1;
+            statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
+          })
         }
       };
 
       await this.saveLotFilters();
 
-      await this.modelLogs.create({
-        message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}, File name saved: ${fileName}`,
-        status: lots.length === (statistics.update + statistics.add) ? 'Success' : 'Warning',
-      });
+      // await this.modelLogs.create({
+      //   message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}, File name saved: ${fileName}`,
+      //   status: lots.length === (statistics.update + statistics.add) ? 'Success' : 'Warning',
+      // });
 
       return {"status": true, "delete:": endLotsIds.length};
     } catch (error) {
@@ -203,6 +209,17 @@ exports.CarsRefresh = class CarsRefresh {
 
       //   return await this.getLots();
       // } else return e.data;
+    });
+  }
+
+  async getLotsFile() {
+    return await axios.get('https://unocreative.ams3.cdn.digitaloceanspaces.com/5a2524c52c5446a718fd1c3a2daa2ba7e94981f124997788ceb9414929217495.txt').then((res) => {
+      // console.log("res", res);
+
+    return {lots: res.data, fileName: "resFile?.id"};
+    }).catch(async (e) => {
+      console.log("e", e);
+      // return await this.getLotsSelled();
     });
   }
 
