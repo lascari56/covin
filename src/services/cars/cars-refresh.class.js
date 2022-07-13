@@ -42,7 +42,7 @@ exports.CarsRefresh = class CarsRefresh {
     // return {status: "true"};
 
     try {
-      const {lots, fileName} = await this.getLots(true);
+      const {lots, fileName} = await this.getLots();
 
       // const {lots, fileName} = await this.getLotsFile();
 
@@ -111,10 +111,10 @@ exports.CarsRefresh = class CarsRefresh {
 
       await this.saveLotFilters();
 
-      // await this.modelLogs.create({
-      //   message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}, File name saved: ${fileName}`,
-      //   status: lots.length === (statistics.update + statistics.add) ? 'Success' : 'Warning',
-      // });
+      await this.modelLogs.create({
+        message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}, File name saved: ${fileName}`,
+        status: lots.length === (statistics.update + statistics.add) ? 'Success' : 'Warning',
+      });
 
       return {"status": true, "delete:": endLotsIds.length};
     } catch (error) {
