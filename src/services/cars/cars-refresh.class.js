@@ -22,7 +22,6 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async find () {
-
     // return new Date().getTime();
 
     // let data = await this.model.aggregate([
@@ -42,7 +41,7 @@ exports.CarsRefresh = class CarsRefresh {
     // return {status: "true"};
 
     try {
-      const {lots, fileName} = await this.getLots();
+      const {lots} = await this.getLots();
 
       // const {lots, fileName} = await this.getLotsFile();
 
@@ -90,15 +89,16 @@ exports.CarsRefresh = class CarsRefresh {
         _item.auction_date = _item.auction_date ? moment(_item.auction_date).unix() : null;
         _item.auction_date_known = !!_item.auction_date;
 
-        let res = await this.model.findOneAndUpdate({'lot_id': _item.lot_id}, _item).then(() => {
-          statistics.update += 1;
-          statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
-        })
-
-        // if (!!res) {
+        await this.model.findOneAndUpdate({'lot_id': _item.lot_id}, _item)
+        // .then(async (res) => {
         //   statistics.update += 1;
         //   statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
-        // }
+        // })
+
+        if (!!res) {
+          statistics.update += 1;
+          statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
+        }
 
         // if (!res && endLotsIds.indexOf(_item.lot_id) === -1 && selledLotIds.indexOf(_item.lot_id) === -1) {
         if (!res) {
@@ -112,7 +112,7 @@ exports.CarsRefresh = class CarsRefresh {
       await this.saveLotFilters();
 
       await this.modelLogs.create({
-        message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}, File name saved: ${fileName}`,
+        message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}, File name saved: ${this.fileName}`,
         status: lots.length === (statistics.update + statistics.add) ? 'Success' : 'Warning',
       });
 
@@ -120,7 +120,7 @@ exports.CarsRefresh = class CarsRefresh {
     } catch (error) {
 
       await this.modelLogs.create({
-        message: `${error}`,
+        message: `${error}, File name saved: ${this.fileName}`,
         status: 'Error',
       });
 
@@ -171,6 +171,8 @@ exports.CarsRefresh = class CarsRefresh {
         s3: { ACL: 'public-read' }
       });
 
+      this.fileName = resFile?.id;
+
 
       // .then(function (result) {
       //   // console.log('Stored blob with id', result);
@@ -196,7 +198,7 @@ exports.CarsRefresh = class CarsRefresh {
       //   console.log('Saved!', data);
       // });
 
-      return {lots: _res, fileName: resFile?.id};
+      return {lots: _res};
     }).catch(async (e) => {
 
       console.log("eeee", e);
