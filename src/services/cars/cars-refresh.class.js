@@ -50,7 +50,7 @@ exports.CarsRefresh = class CarsRefresh {
 
       const selledLots = await this.getLotsSelled();
 
-      const selledLotIds = selledLots.map((item) => item.lot_id);
+      // const selledLotIds = selledLots.map((item) => item.lot_id);
 
       // return {data: lots};
 
@@ -61,11 +61,11 @@ exports.CarsRefresh = class CarsRefresh {
               $lte: moment().subtract(3, 'hours').unix(),
             }
           },
-          {
-            lot_id: {
-              $in: selledLotIds,
-            }
-          }
+          // {
+          //   lot_id: {
+          //     $in: selledLotIds,
+          //   }
+          // }
         ],
       }).select("lot_id").allowDiskUse(true);
 
@@ -89,7 +89,7 @@ exports.CarsRefresh = class CarsRefresh {
         _item.auction_date = _item.auction_date ? moment(_item.auction_date).unix() : null;
         _item.auction_date_known = !!_item.auction_date;
 
-        await this.model.findOneAndUpdate({'lot_id': _item.lot_id}, _item)
+        let res = await this.model.findOneAndUpdate({'lot_id': _item.lot_id}, _item)
         // .then(async (res) => {
         //   statistics.update += 1;
         //   statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
