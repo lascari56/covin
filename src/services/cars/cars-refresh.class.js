@@ -22,6 +22,18 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async find () {
+    // await this.modelLogs.create({
+    //   message: `Test`,
+    //   status: 'SUCCESS',
+    // });
+
+    // await this.app.services["logs"].create({
+    //   status: 'SUCCESS',
+    //   message: "test"
+    // });
+
+    // return {data: true};
+    // return await this.deleteRepit();
     // return new Date().getTime();
 
     // let data = await this.model.aggregate([
@@ -48,25 +60,25 @@ exports.CarsRefresh = class CarsRefresh {
 
       // return { fileName, lots };
 
-      const selledLots = await this.getLotsSelled();
+      // const selledLots = await this.getLotsSelled();
 
       // const selledLotIds = selledLots.map((item) => item.lot_id);
 
       // return {data: lots};
 
       const endLots = await this.model.find({
-        $or: [
-          {
+        // $or: [
+        //   {
             auction_date: {
               $lte: moment().subtract(3, 'hours').unix(),
             }
-          },
+          // },
           // {
           //   lot_id: {
           //     $in: selledLotIds,
           //   }
           // }
-        ],
+        // ],
       }).select("lot_id").allowDiskUse(true);
 
       const endLotsIds = endLots.map((item) => item.lot_id);
@@ -111,17 +123,17 @@ exports.CarsRefresh = class CarsRefresh {
 
       await this.saveLotFilters();
 
-      await this.modelLogs.create({
+      await this.app.services["logs"].create({
         message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}, File name saved: ${this.fileName}`,
-        status: lots.length === (statistics.update + statistics.add) ? 'Success' : 'Warning',
+        status: lots.length === (statistics.update + statistics.add) ? 'SUCCESS' : 'WARNING',
       });
 
       return {"status": true, "delete:": endLotsIds.length};
     } catch (error) {
 
-      await this.modelLogs.create({
+      await this.app.services["logs"].create({
         message: `${error}, File name saved: ${this.fileName}`,
-        status: 'Error',
+        status: 'ERROR',
       });
 
       console.log("11111", error);
@@ -202,6 +214,11 @@ exports.CarsRefresh = class CarsRefresh {
     }).catch(async (e) => {
 
       console.log("eeee", e);
+
+      await this.app.services["logs"].create({
+        message: `${error}, File name saved: ${this.fileName}`,
+        status: 'ERROR',
+      });
 
       return await this.getLots();
 
@@ -295,6 +312,37 @@ exports.CarsRefresh = class CarsRefresh {
     if (!res) await this.modelCarFilters.create(filters);
 
     return true;
+  }
+
+  async deleteRepit() {
+    let data = await this.model.aggregate([
+      {
+        $group:
+        {
+          // _id: {
+          //   make: "$make",
+          //   model: "$model",
+          //   series: "$series",
+          //   [filter]: `$${filter}`
+          // },
+          _id: "$vin",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    let _data = data.filter((el) => el.count >= 2);
+
+    for (let item of _data) {
+      let res = await this.model.deleteOne({vin: item._id})
+
+      // await this.model.delete({_id: res._id});
+      console.log("res", res);
+    }
+
+    // const ids = res.map((el) => )
+
+    return _data;
   }
 
   // async updateData() {

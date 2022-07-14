@@ -36,18 +36,18 @@ exports.getVinReport = async (context) => {
   //   // vin: context.result.vin,
   // });
 
-  let res = await context.app.service('logs').find({});
+  // let res = await context.app.service('logs').find({});
 
   // let res = await context.app.service('users').find({});
 
-      console.log("logs", res);
+      // console.log("logs", res);
 
-  return {
-    api: 'CarFax_OAE3',
-    status: 'SUCCESS',
-    client: context.result.client._id,
-    vin: context.result.vin,
-  };
+  // return {
+  //   api: 'CarFax_OAE3',
+  //   status: 'SUCCESS',
+  //   client: context.result.client._id,
+  //   vin: context.result.vin,
+  // };
 
   //TODO: Переписать. Слелать if только на сорт. Фетч данных винести из него
   if (context.result.client.group === 'old') {

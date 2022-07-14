@@ -1,4 +1,5 @@
 const { authenticate } = require('@feathersjs/authentication').hooks;
+const search = require('feathers-mongodb-fuzzy-search');
 
 const {getVinReport} = require('../../controllers/reportController');
 
@@ -7,13 +8,16 @@ module.exports = {
     all: [ authenticate('jwt') ],
     find: [async context => {
       context.params.query = {
+        ...context.params.query,
         client: {
           $in: context.params.user._id
         }
       };
 
       return context;
-    }],
+    }, search({
+      fields: ['vin']
+    })],
     get: [],
     create: [async context => {
       // console.log("context", context);
