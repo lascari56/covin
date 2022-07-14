@@ -51,11 +51,19 @@ module.exports = function (app) {
 
   schema.index(
     { title: 'text', lot_id: 'text', vin: 'text' },
+    { title: 1 },
+    { lot_id: 1 },
+    { vin: 1 },
     { year: 1 },
+    { price_new: 1 },
     { odometr: 1 },
     { cost_repair: 1 },
     { damage_pr: 1, damage_sec: 1 },
+    { damage_pr: 1 },
+    { damage_sec: 1 },
     { make: 1 },
+    { model: 1 },
+    { series: 1 },
     { loss: 1 },
     { drive: 1 },
     { status: 1 },
@@ -72,6 +80,7 @@ module.exports = function (app) {
     { auction_date_known: 1 },
     { date_adding_new: 1 },
     { date_adding_old: 1 },
+    { createdAt: 1 },
   );
 
   // This is necessary to avoid model compilation errors in watch mode

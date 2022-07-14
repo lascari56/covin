@@ -27,12 +27,10 @@ exports.getReport = async (vin, userId, app) => {
         }
 
         await app.services["logs"].create({
-          message: "test",
-          status: "SUCCESS"
-          // api: 'CarFax_OAE3',
-          // status: 'SUCCESS',
-          // client: userId,
-          // vin: vin
+          api: 'CarFax_OAE3',
+          status: 'SUCCESS',
+          client: userId,
+          vin: vin
         });
 
         return report;
