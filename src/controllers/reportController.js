@@ -88,6 +88,7 @@ exports.getVinReport = async (context) => {
       console.log('in controller')
       console.log(data)
       context.result.file = data.file
+      if (!!data.bonusSticker) context.result.bonusSticker = data.bonusSticker
       context.result.source = source
       context.result.status = data.status || 'Success'
       context.result.order_token = data.order_token || ''
