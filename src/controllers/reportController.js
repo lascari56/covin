@@ -93,7 +93,7 @@ exports.getVinReport = async (context) => {
       context.result.status = data.status || 'Success'
       context.result.order_token = data.order_token || ''
       if (data.status !== 'error'){
-        context.result.price =
+        // context.result.price =
         context.result.client.price[context.result.source_group] || source.sell_price
         context.result.profit = context.result.price - source.net_price;
       }

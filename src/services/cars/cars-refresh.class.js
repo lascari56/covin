@@ -19,6 +19,7 @@ exports.CarsRefresh = class CarsRefresh {
     this.app = app;
     this.countError = 0;
     this.fileName = null;
+    this.fileNameSelled = null;
   }
 
   async find () {
@@ -60,25 +61,25 @@ exports.CarsRefresh = class CarsRefresh {
 
       // return { fileName, lots };
 
-      // const selledLots = await this.getLotsSelled();
+      const selledLots = await this.getLotsSelled();
 
-      // const selledLotIds = selledLots.map((item) => item.lot_id);
+      const selledLotIds = selledLots.map((item) => item.lot_id);
 
       // return {data: lots};
 
       const endLots = await this.model.find({
-        // $or: [
-        //   {
+        $or: [
+          {
             auction_date: {
               $lte: moment().subtract(3, 'hours').unix(),
             }
-          // },
-          // {
-          //   lot_id: {
-          //     $in: selledLotIds,
-          //   }
-          // }
-        // ],
+          },
+          {
+            lot_id: {
+              $in: selledLotIds,
+            }
+          }
+        ],
       }).select("lot_id").allowDiskUse(true);
 
       const endLotsIds = endLots.map((item) => item.lot_id);
@@ -113,7 +114,8 @@ exports.CarsRefresh = class CarsRefresh {
         }
 
         // if (!res && endLotsIds.indexOf(_item.lot_id) === -1 && selledLotIds.indexOf(_item.lot_id) === -1) {
-        if (!res) {
+        // if (!res) {
+        if (!res && selledLotIds.indexOf(_item.lot_id) === -1) {
           await this.model.create(_item).then(() => {
             statistics.add += 1;
             statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
@@ -124,7 +126,7 @@ exports.CarsRefresh = class CarsRefresh {
       await this.saveLotFilters();
 
       await this.app.services["logs"].create({
-        message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}, File name saved: ${this.fileName}`,
+        message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}, File name saved: ${this.fileName}, File selled name saved: ${this.fileNameSelled}`,
         status: lots.length === (statistics.update + statistics.add) ? 'SUCCESS' : 'WARNING',
       });
 
@@ -165,13 +167,13 @@ exports.CarsRefresh = class CarsRefresh {
 
       // c
 
-      const blob = {
-        uri: getBase64DataURI(new Buffer(JSON.stringify(_res)), 'text/plain'),
-        ACL: 'public-read',
-        // filename: `${fileName}.txt`
-      };
+      // const blob = {
+      //   uri: getBase64DataURI(new Buffer(JSON.stringify(_res)), 'text/plain'),
+      //   ACL: 'public-read',
+      //   // filename: `${fileName}.txt`
+      // };
 
-      const blobService = this.app.service('upload');
+      // const blobService = this.app.service('upload');
 
       // blobService.before({
       //   create(hook) {
@@ -179,11 +181,11 @@ exports.CarsRefresh = class CarsRefresh {
       //   }
       // });
 
-      const resFile = await blobService.create(blob, {
-        s3: { ACL: 'public-read' }
-      });
+      // const resFile = await blobService.create(blob, {
+      //   s3: { ACL: 'public-read' }
+      // });
 
-      this.fileName = resFile?.id;
+      this.fileName = await this.saveFile(_res);
 
 
       // .then(function (result) {
@@ -243,7 +245,9 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async getLotsSelled() {
-    return await axios.get('https://vmi423304.contaboserver.net/API/api2_1_iaai_copart_sold_lots.php?api_key=E5nH1rkFKQ8Xr38mPag').then((res) => {
+    return await axios.get('https://vmi423304.contaboserver.net/API/api2_1_iaai_copart_sold_lots.php?api_key=E5nH1rkFKQ8Xr38mPag').then(async (res) => {
+      this.fileNameSelled = await this.saveFile(res.data);
+
       return res.data;
     }).catch(async (e) => {
       return await this.getLotsSelled();
@@ -358,4 +362,20 @@ exports.CarsRefresh = class CarsRefresh {
 
   //   }
   // }
+
+  async saveFile(data) {
+    const blob = {
+      uri: getBase64DataURI(new Buffer(JSON.stringify(data)), 'text/plain'),
+      ACL: 'public-read',
+      // filename: `${fileName}.txt`
+    };
+
+    const blobService = this.app.service('upload');
+
+    const resFile = await blobService.create(blob, {
+      s3: { ACL: 'public-read' }
+    });
+
+    return resFile?.id
+  }
 };
