@@ -14,7 +14,32 @@ module.exports = {
     find: [
       search({
         fields: ['title', 'lot_id', 'vin']
-      })
+      }),
+      async context => {
+        // console.log("context", context);
+
+        if (!!context.params.query.filter) {
+          const data = await context.app.service(`car-${context.params.query.filter}`).find({
+            query: {
+              client: {
+                $in: context?.params?.user?._id
+              }
+            },
+            user: context?.params?.user
+          });
+
+          let ids = data.map((item) => item.car);
+
+          if (ids && ids.length) context.params.query = {
+            ...context.params.query,
+            _id: {
+              $in: ids
+            }
+          };
+        }
+
+        // console.log("comments", comments);
+      }
     ],
     get: [],
     create: [],
