@@ -10,6 +10,7 @@ const carComments = require('./car-comments/car-comments.service.js');
 const carHidden = require('./car-hidden/car-hidden.service.js');
 const source = require('./source/source.service.js');
 const report = require('./report/report.service.js');
+const billing = require('./billing/billing.service.js');
 // eslint-disable-next-line no-unused-vars
 module.exports = function (app) {
   app.configure(users);
@@ -24,4 +25,5 @@ module.exports = function (app) {
   app.configure(carHidden);
   app.configure(source);
   app.configure(report);
+  app.configure(billing);
 };
