@@ -14,60 +14,63 @@ exports.BillingStatus = class BillingStatus extends Service {
   }
 
   async create (data) {
-    console.log("wayForPayResponse", data);
+    try {
+      console.log("wayForPayResponse", data);
 
-  //   // const billing = new this.model();
+      // const billing = new this.model();
 
-    const wayForPayResponse = JSON.parse(Object.keys(data));
-    const billing = await this.model.findById(wayForPayResponse.orderReference);
+      const wayForPayResponse = JSON.parse(Object.keys(data));
+      const billing = await this.model.findById(wayForPayResponse.orderReference);
 
-    // return billing;
+      // return billing;
 
-    const billingPreviousStatus =
-      billing.data !== undefined ? billing.data.transactionStatus : 'Pending';
+      const billingPreviousStatus =
+        billing.data !== undefined ? billing.data.transactionStatus : 'Pending';
 
-    if (wayForPayResponse.orderReference) {
-
-      let res = await this.model.findOneAndUpdate(data.orderReference, {
-        data: wayForPayResponse,
-      });
-
-      // console.log("res", res);
-
-      // billing.data = data;
-      // await billing.save();
-
-      if (
-        billing.data.transactionStatus === 'Approved' &&
-        billingPreviousStatus !== 'Approved'
-      ) {
-        const client = await this.modelUser.findById(billing.client);
-
-        client.balance += billing.data.amount;
-
-        await client.save();
-
-        await this.app.services["lots"].create(billing.client, {
-          message: billing.data.amount,
-          status: billing.data.transactionStatus,
-          client: billing.client,
+      if (wayForPayResponse.orderReference) {
+        await this.model.findOneAndUpdate(data.orderReference, {
+          data: wayForPayResponse,
         });
 
-        const wfpResponse = {
-          orderReference: wayForPayResponse.orderReference,
-          status: 'accept',
-          time: new Date().getTime(),
-        };
+        // console.log("res", res);
 
-        const hashArray = Object.values(wfpResponse);
-        const hashString = hashArray.join(';');
-        wfpResponse.signature = crypto
-          .createHmac('md5', key)
-          .update(hashString)
-          .digest('hex');
+        // billing.data = data;
+        // await billing.save();
 
-        return wfpResponse;
+        if (
+          billing.data.transactionStatus === 'Approved' &&
+          billingPreviousStatus !== 'Approved'
+        ) {
+          const client = await this.modelUser.findById(billing.client);
+
+          client.balance += billing.data.amount;
+
+          await client.save();
+
+          await this.app.services["lots"].create(billing.client, {
+            message: billing.data.amount,
+            status: billing.data.transactionStatus,
+            client: billing.client,
+          });
+
+          const wfpResponse = {
+            orderReference: wayForPayResponse.orderReference,
+            status: 'accept',
+            time: new Date().getTime(),
+          };
+
+          const hashArray = Object.values(wfpResponse);
+          const hashString = hashArray.join(';');
+          wfpResponse.signature = crypto
+            .createHmac('md5', key)
+            .update(hashString)
+            .digest('hex');
+
+          return wfpResponse;
+        }
       }
+    } catch (error) {
+      console.log("err", error);
     }
   }
 };
