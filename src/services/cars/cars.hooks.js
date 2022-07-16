@@ -18,6 +18,7 @@ module.exports = {
       async context => {
         // console.log("context", context);
 
+
         if (!!context.params.query.filter) {
           const data = await context.app.service(`car-${context.params.query.filter}`).find({
             query: {
@@ -34,6 +35,27 @@ module.exports = {
             ...context.params.query,
             _id: {
               $in: ids
+            }
+          };
+        }
+
+        if (context.params.query.filter !== "hidden") {
+          const hiddens = await context.app.service(`car-hidden`).find({
+            query: {
+              client: {
+                $in: context?.params?.user?._id
+              }
+            },
+            user: context?.params?.user
+          });
+
+          let hiddenids = hiddens.map((item) => item.car);
+
+          if (hiddenids && hiddenids.length) context.params.query = {
+            ...context.params.query,
+            _id: {
+              ...context.params.query._id,
+              $nin: hiddenids
             }
           };
         }
