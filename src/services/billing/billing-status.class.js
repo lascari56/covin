@@ -14,7 +14,7 @@ exports.BillingStatus = class BillingStatus extends Service {
   }
 
   async create (data) {
-    // console.log("wayForPayResponse", data);
+    console.log("wayForPayResponse", data);
 
   //   // const billing = new this.model();
 
