@@ -18,18 +18,18 @@ exports.BillingStatus = class BillingStatus extends Service {
 
   //   // const billing = new this.model();
 
-    // const wayForPayResponse = JSON.parse(Object.keys(data));
-    const billing = await this.model.findById(data.orderReference);
+    const wayForPayResponse = JSON.parse(Object.keys(data));
+    const billing = await this.model.findById(wayForPayResponse.orderReference);
 
     // return billing;
 
     const billingPreviousStatus =
       billing.data !== undefined ? billing.data.transactionStatus : 'Pending';
 
-    if (data.orderReference) {
+    if (wayForPayResponse.orderReference) {
 
       let res = await this.model.findOneAndUpdate(data.orderReference, {
-        data,
+        data: wayForPayResponse,
       });
 
       // console.log("res", res);
@@ -53,20 +53,20 @@ exports.BillingStatus = class BillingStatus extends Service {
           client: billing.client,
         });
 
-        // const wfpResponse = {
-        //   orderReference: data.orderReference,
-        //   status: 'accept',
-        //   time: new Date().getTime(),
-        // };
+        const wfpResponse = {
+          orderReference: wayForPayResponse.orderReference,
+          status: 'accept',
+          time: new Date().getTime(),
+        };
 
-        // const hashArray = Object.values(wfpResponse);
-        // const hashString = hashArray.join(';');
-        // wfpResponse.signature = crypto
-        //   .createHmac('md5', key)
-        //   .update(hashString)
-        //   .digest('hex');
+        const hashArray = Object.values(wfpResponse);
+        const hashString = hashArray.join(';');
+        wfpResponse.signature = crypto
+          .createHmac('md5', key)
+          .update(hashString)
+          .digest('hex');
 
-        return true;
+        return wfpResponse;
       }
     }
   }
