@@ -3,7 +3,7 @@ const crypto = require('crypto');
 
 const createModel = require('../../models/billing.model');
 
-const key = '3212414acf7d83151b28c2292928bb70a3c05270';
+const key = '591faa88a7834df2961b268a2755a8cc8a8bbcb9';
 
 exports.Billing = class Billing extends Service {
   setup(app) {
@@ -17,10 +17,10 @@ exports.Billing = class Billing extends Service {
     const billing = new this.model();
 
     const bodyReq = {
-      merchantAccount: 'covin_pro',
+      merchantAccount: 'covin_frontend_herokuapp_com',
       // merchantAccount: 'test_merch_n1',
       // merchantDomainName: 'http://localhost:3000',
-      merchantDomainName: 'https://covin-frontend.herokuapp.com',
+      merchantDomainName: 'https://covin-frontend.herokuapp.com/cabinet/payments',
       orderReference: billing._id,
       orderDate: new Date().getTime(),
       amount: data.amount,
@@ -37,7 +37,7 @@ exports.Billing = class Billing extends Service {
     const billingReq = {
       ...bodyReq,
       language: 'AUTO',
-      serviceUrl: 'http://localhost:3030/billing-status',
+      serviceUrl: 'https://covin-dev.herokuapp.com/billing-status',
       merchantSignature: hmac,
     };
 
