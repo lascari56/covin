@@ -20,26 +20,36 @@ exports.BillingStatus = class BillingStatus extends Service {
       // const billing = new this.model();
 
       const wayForPayResponse = JSON.parse(Object.keys(data));
-      const billing = await this.model.findById(wayForPayResponse.orderReference);
+      // const wayForPayResponse = data;
+      // const billing = await this.model.findById(wayForPayResponse.orderReference);
+      let billing = await this.app.service("billing").get(wayForPayResponse.orderReference);
 
-      // return billing;
+      // const res = await this.app.service("billing").update(billing._id, {
+      //   ...billing,
+      //   data: wayForPayResponse,
+      // });
 
-      const billingPreviousStatus =
-        billing.data !== undefined ? billing.data.transactionStatus : 'Pending';
+      // return {"data": res};
+
+      const billingPreviousStatus = billing?.data?.transactionStatus || 'Pending';
+
+      // return billingPreviousStatus;
 
       if (wayForPayResponse.orderReference) {
-        await this.model.findOneAndUpdate(data.orderReference, {
+        billing = await this.app.service("billing").update(billing._id, {
+          ...billing,
           data: wayForPayResponse,
         });
 
+
+        // return billingPreviousStatus;
+
         // console.log("res", res);
 
-        // billing.data = data;
-        // await billing.save();
-
         if (
-          billing.data.transactionStatus === 'Approved' &&
+          billing?.data?.transactionStatus === 'Approved' &&
           billingPreviousStatus !== 'Approved'
+          // true
         ) {
           const client = await this.modelUser.findById(billing.client);
 
@@ -47,11 +57,11 @@ exports.BillingStatus = class BillingStatus extends Service {
 
           await client.save();
 
-          await this.app.services["lots"].create(billing.client, {
-            message: billing.data.amount,
-            status: billing.data.transactionStatus,
-            client: billing.client,
-          });
+          // await this.app.service("logs").create({
+          //   message: billing.data.amount,
+          //   status: billing.data.transactionStatus,
+          //   client: billing.client,
+          // });
 
           const wfpResponse = {
             orderReference: wayForPayResponse.orderReference,
@@ -69,6 +79,8 @@ exports.BillingStatus = class BillingStatus extends Service {
           return wfpResponse;
         }
       }
+
+      return true;
     } catch (error) {
       console.log("err", error);
     }

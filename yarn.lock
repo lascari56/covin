@@ -277,9 +277,9 @@
   "version" "6.1.1"
 
 "@types/whatwg-url@^8.2.1":
-  "integrity" "sha512-2YubE1sjj5ifxievI5Ge1sckb9k/Er66HyR2c+3+I6VDUUg1TLPdYYTEbQ+DjRkS4nTxMJhgWfSfMRD2sl2EYQ=="
-  "resolved" "https://registry.npmjs.org/@types/whatwg-url/-/whatwg-url-8.2.1.tgz"
-  "version" "8.2.1"
+  "integrity" "sha512-FtQu10RWgn3D9U4aazdwIE2yzphmTJREDqNdODHrbrZmmMqI0vMheC/6NE/J1Yveaj8H+ela+YwWTjq5PGmuhA=="
+  "resolved" "https://registry.npmjs.org/@types/whatwg-url/-/whatwg-url-8.2.2.tgz"
+  "version" "8.2.2"
   dependencies:
     "@types/node" "*"
     "@types/webidl-conversions" "*"
@@ -504,10 +504,10 @@
   "resolved" "https://registry.npmjs.org/bson/-/bson-1.1.6.tgz"
   "version" "1.1.6"
 
-"bson@^4.6.2":
-  "integrity" "sha512-TdQ3FzguAu5HKPPlr0kYQCyrYUYh8tFM+CMTpxjNzVzxeiJY00Rtuj3LXLHSgiGvmaWlZ8PE+4KyM2thqE38pQ=="
-  "resolved" "https://registry.npmjs.org/bson/-/bson-4.6.4.tgz"
-  "version" "4.6.4"
+"bson@^4.6.2", "bson@^4.6.3":
+  "integrity" "sha512-uqrgcjyOaZsHfz7ea8zLRCLe1u+QGUSzMZmvXqO24CDW7DWoW1qiN9folSwa7hSneTSgM2ykDIzF5kcQQ8cwNw=="
+  "resolved" "https://registry.npmjs.org/bson/-/bson-4.6.5.tgz"
+  "version" "4.6.5"
   dependencies:
     "buffer" "^5.6.0"
 
@@ -1819,10 +1819,10 @@
     "jwa" "^1.4.1"
     "safe-buffer" "^5.0.1"
 
-"kareem@2.3.5":
-  "integrity" "sha512-qxCyQtp3ioawkiRNQr/v8xw9KIviMSSNmy+63Wubj7KmMn3g7noRXIZB4vPCAP+ETi2SR8eH6CvmlKZuGpoHOg=="
-  "resolved" "https://registry.npmjs.org/kareem/-/kareem-2.3.5.tgz"
-  "version" "2.3.5"
+"kareem@2.4.1":
+  "integrity" "sha512-aJ9opVoXroQUPfovYP5kaj2lM7Jn02Gw13bL0lg9v0V7SaUc0qavPs0Eue7d2DcC3NjqI6QAUElXNsuZSeM+EA=="
+  "resolved" "https://registry.npmjs.org/kareem/-/kareem-2.4.1.tgz"
+  "version" "2.4.1"
 
 "keyv@^3.0.0":
   "integrity" "sha512-9ykJ/46SN/9KPM/sichzQ7OvXyGDYKGTaDlKMGCAlg2UK8KRy4jb0d8sFc+0Tt0YYnThq8X2RZgCg74RPxgcVA=="
@@ -2066,26 +2066,26 @@
   optionalDependencies:
     "saslprep" "^1.0.0"
 
-"mongodb@4.5.0":
-  "integrity" "sha512-A2l8MjEpKojnhbCM0MK3+UOGUSGvTNNSv7AkP1fsT7tkambrkkqN/5F2y+PhzsV0Nbv58u04TETpkaSEdI2zKA=="
-  "resolved" "https://registry.npmjs.org/mongodb/-/mongodb-4.5.0.tgz"
-  "version" "4.5.0"
+"mongodb@4.7.0":
+  "integrity" "sha512-HhVar6hsUeMAVlIbwQwWtV36iyjKd9qdhY+s4wcU8K6TOj4Q331iiMy+FoPuxEntDIijTYWivwFJkLv8q/ZgvA=="
+  "resolved" "https://registry.npmjs.org/mongodb/-/mongodb-4.7.0.tgz"
+  "version" "4.7.0"
   dependencies:
-    "bson" "^4.6.2"
+    "bson" "^4.6.3"
     "denque" "^2.0.1"
     "mongodb-connection-string-url" "^2.5.2"
     "socks" "^2.6.2"
   optionalDependencies:
     "saslprep" "^1.0.3"
 
-"mongoose@^6.1.4", "mongoose@>=6.0.11":
-  "integrity" "sha512-/Cixfo+bA32EHQ5Y7sxMj5ZOXFiAFlvA3X4mFruUET9OsbJZfstg4n2FzxovX8Q7EcoQ7Ry1bnOp9AeXtodF7w=="
-  "resolved" "https://registry.npmjs.org/mongoose/-/mongoose-6.3.6.tgz"
-  "version" "6.3.6"
+"mongoose@^6.4.4", "mongoose@>=6.0.11":
+  "integrity" "sha512-r6sp96veRNhNIWFtHHe4Lqak+ilgiExYnnMLhYTGdzjIMR90G1ayx0JKFVdHuC6dKNHGFX0ETJGbf36N8Romjg=="
+  "resolved" "https://registry.npmjs.org/mongoose/-/mongoose-6.4.4.tgz"
+  "version" "6.4.4"
   dependencies:
     "bson" "^4.6.2"
-    "kareem" "2.3.5"
-    "mongodb" "4.5.0"
+    "kareem" "2.4.1"
+    "mongodb" "4.7.0"
     "mpath" "0.9.0"
     "mquery" "4.0.3"
     "ms" "2.1.3"

@@ -47,4 +47,10 @@ exports.Billing = class Billing extends Service {
 
     return billingReq;
   }
+
+  // async patch (id, data, params) {
+  //   console.log("data", params);
+
+  //   return true;
+  // }
 };
