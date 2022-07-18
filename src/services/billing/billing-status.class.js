@@ -57,11 +57,11 @@ exports.BillingStatus = class BillingStatus extends Service {
 
           await client.save();
 
-          // await this.app.service("logs").create({
-          //   message: billing.data.amount,
-          //   status: billing.data.transactionStatus,
-          //   client: billing.client,
-          // });
+          await this.app.service("logs").create({
+            message: billing.data.amount,
+            status: billing.data.transactionStatus,
+            client: billing.client,
+          });
 
           const wfpResponse = {
             orderReference: wayForPayResponse.orderReference,

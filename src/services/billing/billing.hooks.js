@@ -5,7 +5,19 @@ module.exports = {
     all: [
       // authenticate('jwt')
     ],
-    find: [],
+    find: [
+      authenticate('jwt'),
+      async context => {
+        context.params.query = {
+          ...context.params.query,
+          client: {
+            $in: context.params.user._id
+          }
+        };
+
+        return context;
+      }
+    ],
     get: [],
     create: [
       authenticate('jwt')
