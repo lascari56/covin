@@ -15,7 +15,7 @@ exports.Cars = class Cars extends Service {
       query.make = Object.values(query?.make)
     }
 
-    console.log("query", query);
+    // console.log("query", query);
 
     // return [];
 

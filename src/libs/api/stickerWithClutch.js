@@ -43,12 +43,12 @@ exports.getReport = async (vin, userId, app) => {
         // })
         // await log.save()
         const filename = `/reports/${vin}_${Date.now()}.pdf`
-        const fileReport = fs.createWriteStream(`./client/public${filename}`)
+        const fileReport = fs.createWriteStream(`./public${filename}`)
         const fileUrl = response.data.data.stickerUrl
         await https.get(fileUrl, function (resFile) {
           resFile.pipe(fileReport)
         })
-        report.file = `https://covin.pro${filename}`
+        report.file = `https://covin-dev.herokuapp.com${filename}`
         report.status = 'Success'
         return report
       } else {

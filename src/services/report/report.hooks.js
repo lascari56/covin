@@ -1,6 +1,8 @@
 const { authenticate } = require('@feathersjs/authentication').hooks;
 const search = require('feathers-mongodb-fuzzy-search');
 
+const createModelUser = require('../../models/users.model');
+
 const {getVinReport} = require('../../controllers/reportController');
 
 module.exports = {
@@ -52,7 +54,35 @@ module.exports = {
     //   // ReportController.getVinReport(report)
     // ],
     update: [],
-    patch: [],
+    patch: [
+      async context => {
+        console.log("context", context);
+        if (context?.result?.status !== 'error') {
+          const modelUser = createModelUser(context.app);
+
+          const client = await modelUser.findById(context?.result?.client);
+
+          client.balance -= context?.result?.price;
+
+          await client.save();
+
+          // const client = await context.app.service("users").get(context?.result?.client)
+
+          // console.log("client", client);
+
+          // let user = await context.app.service("users").patch(client._id, {
+          //   balance: 10
+          // })
+
+          // console.log("user", user);
+
+          // client.balance -= context?.result?.price
+          // await client.save()
+        }
+
+        return context;
+      }
+    ],
     remove: []
   },
 
