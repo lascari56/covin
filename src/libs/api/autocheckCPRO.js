@@ -55,7 +55,7 @@ exports.getReport = async (vin, userId, app) => {
           const file_data = response.data.report.report
           const filename = `/reports/${vin}_${Date.now()}.html`
           fs.writeFile(
-            `./client/public${filename}`,
+            `./public${filename}`,
             file_data,
             { encoding: 'base64' },
             async function (err) {
@@ -63,7 +63,7 @@ exports.getReport = async (vin, userId, app) => {
               await editHtml(filename, 'autocheck')
             }
           )
-          const uploadedFile = `https://covin.pro${filename}`
+          const uploadedFile = `https://covin-dev.herokuapp.com${filename}`
 
           report = {
             order_token: response.data.report.report_hash,

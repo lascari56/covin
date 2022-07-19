@@ -11,14 +11,14 @@ exports.editHtml = async (file, source) => {
     carfaxPro: /https:\/\/api.carfax.pro/g,
     autocheck: /https:\/\/www.autocheck.com|https:\/\/api.carfax.pro/g,
   }
-  const path = `./client/public${file}`
+  const path = `./public${file}`
 
   fs.readFile(path, 'utf-8', async (error, data) => {
     if (error) throw error
     try {
       const fixedFile = data.replace(
         sourcesUrlToReplace[source],
-        'https://covin.pro'
+        'https://covin-dev.herokuapp.com'
       )
       fs.writeFile(path, fixedFile, 'utf-8', function (err) {
         if (err) throw err
