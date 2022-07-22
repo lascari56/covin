@@ -49,9 +49,9 @@ module.exports = function (app) {
     timestamps: true
   });
 
-  schema.index(
-    { lot_id: 1 },
-  );
+  // schema.index(
+  //   { lot_id: 1 },
+  // );
 
   // This is necessary to avoid model compilation errors in watch mode
   // see https://mongoosejs.com/docs/api/connection.html#connection_Connection-deleteModel
