@@ -50,9 +50,9 @@ module.exports = function (app) {
   });
 
   schema.index(
-    { title: 'text', lot_id: 'text', vin: 'text' },
+    // { title: 'text', lot_id: 'text', vin: 'text' },
     { title: 1 },
-    { lot_id: 1 },
+    // { lot_id: 1 },
     { vin: 1 },
     { year: 1 },
     { price_new: 1 },
