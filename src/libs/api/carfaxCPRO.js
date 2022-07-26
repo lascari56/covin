@@ -3,18 +3,21 @@ const axios = require('axios')
 const fs = require('fs')
 const { editHtml } = require('../../controllers/replaceController')
 
-exports.getReport = async (vin, userId, app) => {
+exports.getReport = async (vin, userId, reBuy, app) => {
   let report = null
   let checkResult
   // const apiKey = 'e67ae95b59bd4f637d3ff804da40fe80'
   //prod
   const apiKey = '1e8aaa859c37854c1ad982280b7ff752'
+  let url = `https://api.carfax.pro/wp-json/v1/get_report_check/${vin}`;
+
+  if (!!reBuy) url += `?re_buy=${reBuy}`
 
   console.log('IN CPRO')
 
   const checkConfig = {
     method: 'get',
-    url: 'https://api.carfax.pro/wp-json/v1/get_report_check/' + vin,
+    url,
     headers: {
       Accept: 'application/json',
     },

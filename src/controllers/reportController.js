@@ -5,7 +5,9 @@ const axios = require('axios');
 // const { SendFunc } = require('../libs/bot/index')
 
 exports.getVinReport = async (context) => {
-  // console.log("vinReq", context);
+  console.log("vinReq", context);
+
+  // return result;
 
   let sources = [];
   let result = null;
@@ -79,7 +81,8 @@ exports.getVinReport = async (context) => {
     const data = await Apis[source.name].getReport(
       context.result.vin,
       context.result.client._id,
-      context.app
+      context.data.re_buy,
+      context.app,
     );
 
     // if (source.amount < 20) {

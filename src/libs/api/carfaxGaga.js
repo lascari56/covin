@@ -4,7 +4,7 @@ const http = require('http')
 const fs = require('fs')
 const { editHtml } = require('../../controllers/replaceController')
 
-exports.getReport = async (vin, userId, app) => {
+exports.getReport = async (vin, userId, reBuy, app) => {
   let report = null
 
   const config = {

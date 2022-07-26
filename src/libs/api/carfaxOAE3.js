@@ -2,13 +2,17 @@ const axios = require('axios')
 // const Log = require('../../models/Log')
 const http = require('http')
 
-exports.getReport = async (vin, userId, app) => {
+exports.getReport = async (vin, userId, reBuy, app) => {
 
   let report = null
 
+  let url = `http://covin.top/carfax/get_data.php?vin=${vin}&source=OAE3&token=asdSdDASWDJK`;
+
+  if (!!reBuy) url += `&re_buy=${reBuy}`
+
   const config = {
     method: 'get',
-    url: `http://covin.top/carfax/get_data.php?vin=${vin}&source=OAE3&token=asdSdDASWDJK`,
+    url,
     headers: {
       Accept: 'application/json',
     },

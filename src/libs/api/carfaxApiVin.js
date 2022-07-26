@@ -5,15 +5,18 @@ const fs = require('fs')
 const { editHtml } = require('../../controllers/replaceController')
 const key = 'a9993631-b071-4f33-ad88-c893ca487db8'
 
-exports.getReport = async (vin, userId, app) => {
-  let report = null
-  let checkResult
+exports.getReport = async (vin, userId, reBuy, app) => {
+  let report = null;
+  let checkResult;
+  let url = `http://198.199.90.224/api/v1/carfax/check?vincode=${vin}&api_key=${key}`;
+
+  if (!!reBuy) url += `&re_buy=${reBuy}`;
 
   console.log('IN_APIVIN')
 
   const checkConfig = {
     method: 'get',
-    url: `http://198.199.90.224/api/v1/carfax/check?vincode=${vin}&api_key=${key}`,
+    url,
     headers: {
       Accept: 'application/json',
     },
