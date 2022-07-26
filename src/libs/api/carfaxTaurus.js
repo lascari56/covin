@@ -5,15 +5,18 @@ const fs = require('fs')
 const { editHtml } = require('../../controllers/replaceController')
 const key = '6964597355795538436b2f745645392f4e73462b62413975634c5a516b2f752b6572553d'
 
-exports.getReport = async (vin, userId, app) => {
+exports.getReport = async (vin, userId, reBuy, app) => {
   let report = null
   let checkResult
+  let url = `https://api.carfax.shop/report/getreport?key=${key}&vin=${vin}`;
+
+  if (!!reBuy) url += `&re_buy=${reBuy}`
 
   console.log('IN_Taurus')
 
   const config = {
     method: 'get',
-    url: `https://api.carfax.shop/report/getreport?key=${key}&vin=${vin}`,
+    url,
     headers: {
       Accept: 'application/json',
     },

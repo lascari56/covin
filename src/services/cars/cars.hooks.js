@@ -1,42 +1,56 @@
 const { authenticate } = require('@feathersjs/authentication').hooks;
-const search = require('feathers-mongodb-fuzzy-search');
-
-const createModelCarFilters = require('../../models/car-filters.model');
 
 module.exports = {
   before: {
-    all: [
-      authenticate('jwt')
-      // search({  // regex search on given fields
-      //   fields: ['title']
-      // })
-    ],
+    all: [ authenticate('jwt') ],
     find: [
-      search({
-        fields: ['title', 'lot_id', 'vin']
-      }),
       async context => {
-        // console.log("context", context);
-
+        console.log("context", context?.params?.user?._id);
 
         if (!!context.params.query.filter) {
-          const data = await context.app.service(`car-${context.params.query.filter}`).find({
-            query: {
-              client: {
-                $in: context?.params?.user?._id
+          let data = [];
+
+          if (context.params.query.filter === "purchased_reports") {
+            data = await context.app.service("report").find({
+              query: {
+                client: {
+                  $in: context?.params?.user?._id
+                },
+                status: "Success"
+              },
+              user: context?.params?.user,
+              paginate: false
+            });
+
+            console.log("report", data);
+
+            let ids = data.map((item) => item.vin);
+
+            if (ids && ids.length) context.params.query = {
+              ...context.params.query,
+              vin: {
+                $in: ids
               }
-            },
-            user: context?.params?.user
-          });
+            };
+          } else {
+            data = await context.app.service(`car-${context.params.query.filter}`).find({
+              query: {
+                client: {
+                  $in: context?.params?.user?._id
+                },
+              },
+              user: context?.params?.user
+            });
 
-          let ids = data.map((item) => item.car);
+            let ids = data.map((item) => item.car);
 
-          if (ids && ids.length) context.params.query = {
-            ...context.params.query,
-            _id: {
-              $in: ids
-            }
-          };
+            if (ids && ids.length) context.params.query = {
+              ...context.params.query,
+              _id: {
+                $in: ids
+              }
+            };
+          }
         }
 
         if (context.params.query.filter !== "hidden") {
@@ -60,6 +74,7 @@ module.exports = {
           };
         }
 
+        return context;
         // console.log("comments", comments);
       }
     ],
@@ -137,8 +152,9 @@ module.exports = {
         context.result.data = data;
 
         if (context?.params?.query?.full) {
-          const modelCarFilters = createModelCarFilters(context.app);
-          const filters = await modelCarFilters.find();
+          // const modelCarFilters = createModelCarFilters(context.app);
+          // const filters = await modelCarFilters.find();
+          const filters = await context.app.service("car-filters").find();
 
           context.result.filters = filters[0];
         }
@@ -155,7 +171,13 @@ module.exports = {
 
   error: {
     all: [],
-    find: [],
+    find: [
+      async (context) => {
+        console.log('====================================');
+        console.log("error", context);
+        console.log('====================================');
+      }
+    ],
     get: [],
     create: [],
     update: [],

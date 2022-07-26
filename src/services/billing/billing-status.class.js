@@ -31,7 +31,7 @@ exports.BillingStatus = class BillingStatus extends Service {
 
       // return {"data": res};
 
-      const billingPreviousStatus = billing?.data?.transactionStatus || 'Pending';
+      const billingPreviousStatus = billing?.data && billing?.data?.transactionStatus ? billing?.data?.transactionStatus : 'Pending';
 
       // return billingPreviousStatus;
 
@@ -47,11 +47,10 @@ exports.BillingStatus = class BillingStatus extends Service {
         // console.log("res", res);
 
         if (
-          billing?.data?.transactionStatus === 'Approved' &&
+          wayForPayResponse.transactionStatus === 'Approved' &&
           billingPreviousStatus !== 'Approved'
-          // true
         ) {
-          const client = await this.modelUser.findById(billing.client);
+          const client = await this.app.service("billing").Model.findById(billing.client);
 
           client.balance += billing.data.amount;
 

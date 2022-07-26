@@ -8,24 +8,26 @@ const {getVinReport} = require('../../controllers/reportController');
 module.exports = {
   before: {
     all: [ authenticate('jwt') ],
-    find: [async context => {
-      context.params.query = {
-        ...context.params.query,
-        client: {
-          $in: context.params.user._id
-        }
-      };
+    find: [
+      async context => {
+        context.params.query = {
+          ...context.params.query,
+          client: {
+            $in: context.params.user._id
+          }
+        };
 
-      return context;
-    }, search({
-      fields: ['vin']
-    })],
+        return context;
+      }, search({
+        fields: ['vin']
+      })
+    ],
     get: [],
     create: [async context => {
       // console.log("context", context);
-      // if (context.params.user.balance <= 0) {
-      //   throw new Error('Your balance is empty');
-      // }
+      if (context.params.user.balance <= 0) {
+        throw new Error('Your balance is empty');
+      }
 
       context.data.client = context.params.user;
       context.data.status = 'pending';

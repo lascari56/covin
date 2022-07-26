@@ -19,6 +19,14 @@ class GoogleStrategy extends OAuthStrategy {
   //   return data;
   // }
 
+  async getEntityQuery(profile, params) {
+    console.log("profile", profile);
+
+    return {
+      email: profile.email,
+    };
+  }
+
   async getEntityData(profile) {
 
     // this will set 'googleId'

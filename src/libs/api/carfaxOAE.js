@@ -3,7 +3,7 @@ const axios = require('axios')
 const http = require('http')
 const fs = require('fs')
 
-exports.getReport = async (vin, userId, app) => {
+exports.getReport = async (vin, userId, reBuy, app) => {
 
   let report = null
   const data = { vin: vin }

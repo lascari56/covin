@@ -1,7 +1,7 @@
 const axios = require('axios')
 // const Log = require('../../models/Log')
 
-exports.getReport = async (vin, userId, app) => {
+exports.getReport = async (vin, userId, reBuy, app) => {
   let report = null
   let checkResult
 

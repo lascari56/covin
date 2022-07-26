@@ -6,7 +6,7 @@ const { editHtml } = require('../../controllers/replaceController')
 const Console = require('console')
 const https = require('https')
 
-exports.getReport = async (vin, userId, app) => {
+exports.getReport = async (vin, userId, reBuy, app) => {
   let report = null
   const data = { vin: vin }
 

@@ -5,7 +5,7 @@ const fs = require('fs')
 const { editHtml } = require('../../controllers/replaceController')
 const key = 'WA1AVAF11KD016693&key=31474b4d7a614635377861534b65514f703767386c4b31566a7555746152465432413d3d'
 
-exports.getReport = async (vin, userId, app) => {
+exports.getReport = async (vin, userId, reBuy, app) => {
   let report = null
   let checkResult
 
