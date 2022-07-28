@@ -33,6 +33,9 @@ exports.BillingStatus = class BillingStatus extends Service {
 
       const billingPreviousStatus = billing?.data && billing?.data?.transactionStatus ? billing?.data?.transactionStatus : 'Pending';
 
+      console.log('====================================');
+      console.log("billingPreviousStatus", billingPreviousStatus);
+      console.log('====================================');
       // return billingPreviousStatus;
 
       if (wayForPayResponse.orderReference) {
