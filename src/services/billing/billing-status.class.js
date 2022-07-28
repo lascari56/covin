@@ -34,7 +34,7 @@ exports.BillingStatus = class BillingStatus extends Service {
       const billingPreviousStatus = billing?.data && billing?.data?.transactionStatus ? billing?.data?.transactionStatus : 'Pending';
 
       console.log('====================================');
-      console.log("billingPreviousStatus", billingPreviousStatus);
+      console.log("billingPreviousStatus", {billingPreviousStatus, wayForPayResponse: wayForPayResponse.transactionStatus});
       console.log('====================================');
       // return billingPreviousStatus;
 
@@ -47,7 +47,7 @@ exports.BillingStatus = class BillingStatus extends Service {
 
         // return billingPreviousStatus;
 
-        // console.log("res", res);
+        console.log("res",  wayForPayResponse.transactionStatus === 'Approved' && billingPreviousStatus !== 'Approved');
 
         if (
           wayForPayResponse.transactionStatus === 'Approved' &&
