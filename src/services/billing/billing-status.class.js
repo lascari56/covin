@@ -26,9 +26,16 @@ exports.BillingStatus = class BillingStatus extends Service {
       // const billing = await this.model.findById(wayForPayResponse.orderReference);
       let billing = await this.app.service("billing").get(wayForPayResponse.orderReference);
 
-      // const client = await this.app.service("users").Model.findById(billing.client);
+      // let client = await this.app.service("users").Model.findById(billing.client);
+
+      // client.balance += 1;
 
       // client.balance = client.balance.toFixed(2);
+
+      // return await this.app.service("users").Model.findOneAndUpdate({_id: client._id}, {balance: client.balance});
+      // {balance: client.balance}
+
+      // await client.save();
 
       // return client;
 
@@ -66,7 +73,9 @@ exports.BillingStatus = class BillingStatus extends Service {
           client.balance += billing.data.amount;
           client.balance = client.balance.toFixed(2);
 
-          await client.save();
+          await this.app.service("users").Model.findOneAndUpdate({_id: client._id}, {balance: client.balance})
+
+          // await client.save();
 
           await this.app.service("logs").create({
             message: billing.data.amount,
