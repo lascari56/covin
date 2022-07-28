@@ -141,9 +141,9 @@ exports.CarsRefresh = class CarsRefresh {
 
       await this.app.service("cars").Model.insertMany(addLots);
 
-      console.log("statistics", statistics);
+      // console.log("statistics", statistics);
 
-      // await this.saveLotFilters();
+      await this.saveLotFilters();
 
       await this.app.service("logs").create({
         message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}, File name saved: ${this.fileName}, File selled name saved: ${this.fileNameSelled}`,
