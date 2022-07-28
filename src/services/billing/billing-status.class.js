@@ -19,10 +19,18 @@ exports.BillingStatus = class BillingStatus extends Service {
 
       // const billing = new this.model();
 
+      // const wayForPayResponse = data;
+
       const wayForPayResponse = JSON.parse(Object.keys(data));
       // const wayForPayResponse = data;
       // const billing = await this.model.findById(wayForPayResponse.orderReference);
       let billing = await this.app.service("billing").get(wayForPayResponse.orderReference);
+
+      // const client = await this.app.service("users").Model.findById(billing.client);
+
+      // client.balance = client.balance.toFixed(2);
+
+      // return client;
 
       // const res = await this.app.service("billing").update(billing._id, {
       //   ...billing,
@@ -33,9 +41,9 @@ exports.BillingStatus = class BillingStatus extends Service {
 
       const billingPreviousStatus = billing?.data && billing?.data?.transactionStatus ? billing?.data?.transactionStatus : 'Pending';
 
-      console.log('====================================');
-      console.log("billingPreviousStatus", {billingPreviousStatus, wayForPayResponse: wayForPayResponse.transactionStatus});
-      console.log('====================================');
+      // console.log('====================================');
+      // console.log("billingPreviousStatus", {billingPreviousStatus, wayForPayResponse: wayForPayResponse.transactionStatus});
+      // console.log('====================================');
       // return billingPreviousStatus;
 
       if (wayForPayResponse.orderReference) {
@@ -47,15 +55,16 @@ exports.BillingStatus = class BillingStatus extends Service {
 
         // return billingPreviousStatus;
 
-        console.log("res",  wayForPayResponse.transactionStatus === 'Approved' && billingPreviousStatus !== 'Approved');
+        // console.log("res",  wayForPayResponse.transactionStatus === 'Approved' && billingPreviousStatus !== 'Approved');
 
         if (
           wayForPayResponse.transactionStatus === 'Approved' &&
           billingPreviousStatus !== 'Approved'
         ) {
-          const client = await this.app.service("billing").Model.findById(billing.client);
+          const client = await this.app.service("users").Model.findById(billing.client);
 
           client.balance += billing.data.amount;
+          client.balance = client.balance.toFixed(2);
 
           await client.save();
 
