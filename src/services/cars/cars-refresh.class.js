@@ -1,9 +1,9 @@
 const { Service } = require('feathers-mongoose');
 
 const createModel = require('../../models/cars.model');
-const createModelHistoryCars = require('../../models/history-cars.model');
-const createModelCarFilters = require('../../models/car-filters.model');
-const createModelLogs = require('../../models/logs.model');
+// const createModelHistoryCars = require('../../models/history-cars.model');
+// const createModelCarFilters = require('../../models/car-filters.model');
+// const createModelLogs = require('../../models/logs.model');
 
 const axios = require('axios').default;
 const moment = require('moment');
@@ -13,9 +13,9 @@ const { getBase64DataURI } = require('dauria');
 exports.CarsRefresh = class CarsRefresh {
   setup(app) {
     this.model = createModel(app);
-    this.modelHistoryCars = createModelHistoryCars(app);
-    this.modelCarFilters = createModelCarFilters(app);
-    this.modelLogs = createModelLogs(app);
+    // this.modelHistoryCars = createModelHistoryCars(app);
+    // this.modelCarFilters = createModelCarFilters(app);
+    // this.modelLogs = createModelLogs(app);
     this.app = app;
     this.countError = 0;
     this.fileName = null;
@@ -23,6 +23,7 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async find () {
+    // return await this.saveLotFilters();
     // await this.modelLogs.create({
     //   message: `Test`,
     //   status: 'SUCCESS',
@@ -54,6 +55,7 @@ exports.CarsRefresh = class CarsRefresh {
     // return {status: "true"};
 
     try {
+      let addLots = [];
       const {lots} = await this.getLots();
 
       // const {lots, fileName} = await this.getLotsFile();
@@ -67,7 +69,7 @@ exports.CarsRefresh = class CarsRefresh {
 
       // return {data: lots};
 
-      const endLots = await this.model.find({
+      const endLots = await this.app.service("cars").Model.find({
         $or: [
           {
             auction_date: {
@@ -80,13 +82,19 @@ exports.CarsRefresh = class CarsRefresh {
             }
           }
         ],
-      }).select("lot_id").allowDiskUse(true);
+      }).allowDiskUse(true);
 
-      const endLotsIds = endLots.map((item) => item.lot_id);
+      const endLotsIds = endLots.map((item) => item._id);
 
-      await this.modelHistoryCars.insertMany(endLots);
+      // return endLotsIds;
 
-      await this.model.deleteMany({lot_id: {$in: endLotsIds}});
+      await this.app.service("history-cars").Model.insertMany(endLots);
+
+      await this.app.service("cars").Model.deleteMany({_id: {$in: endLotsIds}});
+      await this.app.service("car-hidden").Model.deleteMany({car: {$in: endLotsIds}});
+      await this.app.service("car-comments").Model.deleteMany({car: {$in: endLotsIds}});
+      await this.app.service("car-bookmarks").Model.deleteMany({car: {$in: endLotsIds}});
+      await this.app.service("car-notifications").Model.deleteMany({car: {$in: endLotsIds}});
 
       const statistics = {
         update: 0,
@@ -102,7 +110,9 @@ exports.CarsRefresh = class CarsRefresh {
         _item.auction_date = _item.auction_date ? moment(_item.auction_date).unix() : null;
         _item.auction_date_known = !!_item.auction_date;
 
-        let res = await this.model.findOneAndUpdate({'lot_id': _item.lot_id}, _item)
+        // console.log("item", item);
+
+        let res = await this.app.service("cars").Model.findOneAndUpdate({'lot_id': _item.lot_id}, _item)
         // .then(async (res) => {
         //   statistics.update += 1;
         //   statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
@@ -116,16 +126,26 @@ exports.CarsRefresh = class CarsRefresh {
         // if (!res && endLotsIds.indexOf(_item.lot_id) === -1 && selledLotIds.indexOf(_item.lot_id) === -1) {
         // if (!res) {
         if (!res && selledLotIds.indexOf(_item.lot_id) === -1) {
-          await this.model.create(_item).then(() => {
-            statistics.add += 1;
-            statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
-          })
+          statistics.add += 1;
+          statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
+
+          addLots.push(_item);
+          // await this.app.service("cars").create(_item).then(() => {
+          //   statistics.add += 1;
+          //   statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
+          // })
         }
+
+        // return statistics;
       };
 
-      await this.saveLotFilters();
+      await this.app.service("cars").Model.insertMany(addLots);
 
-      await this.app.services["logs"].create({
+      console.log("statistics", statistics);
+
+      // await this.saveLotFilters();
+
+      await this.app.service("logs").create({
         message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}, File name saved: ${this.fileName}, File selled name saved: ${this.fileNameSelled}`,
         status: lots.length === (statistics.update + statistics.add) ? 'SUCCESS' : 'WARNING',
       });
@@ -133,7 +153,7 @@ exports.CarsRefresh = class CarsRefresh {
       return {"status": true, "delete:": endLotsIds.length};
     } catch (error) {
 
-      await this.app.services["logs"].create({
+      await this.app.service("logs").create({
         message: `${error}, File name saved: ${this.fileName}`,
         status: 'ERROR',
       });
@@ -217,7 +237,7 @@ exports.CarsRefresh = class CarsRefresh {
 
       console.log("eeee", e);
 
-      await this.app.services["logs"].create({
+      await this.app.service("logs").create({
         message: `${error}, File name saved: ${this.fileName}`,
         status: 'ERROR',
       });
@@ -255,12 +275,58 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async saveLotFilters() {
+    // return true;
+    // const filter = "make";
+
+    // let options = {};
+
+    // if (filter === "model") {
+    //   options = {
+    //     make: "$make",
+    //     model: "$model"
+    //   }
+    // } else if (filter === "series") {
+    //   options = {
+    //     make: "$make",
+    //     model: "$model",
+    //     series: "$series",
+    //   }
+    // } else {
+    //   options = {
+    //     [filter]: `$${filter}`
+    //   }
+    // }
+
+
+    // let data = await this.model.aggregate([
+    //   {
+    //     $group: {
+    //       _id: options,
+    //       count: { $sum: 1 },
+    //     },
+    //   },
+    // ]);
+
+    // let data = await this.app.service("cars").Model.aggregate([
+    //   {
+    //     $group: {
+    //       _id: {
+    //         make: "$make",
+    //         model: "$model",
+    //         series: "$series",
+    //         // [filter]: `$${filter}`
+    //       },
+    //       count: { $sum: 1 },
+    //     },
+    //   },
+    // ]);
+
+    // return data;
+
     let filters = {
       make: {},
       model: {},
       series: {},
-      // year: {},
-      // odometer: {},
       loss: {},
       damage_pr: {},
       damage_sec: {},
@@ -270,27 +336,50 @@ exports.CarsRefresh = class CarsRefresh {
       transmission: {},
       engine: {},
       fuel: {},
-      // cost_repair: {},
       location: {},
       document: {},
       site: {},
     };
 
     for (let filter of Object.keys(filters)) {
+      // console.log('====================================');
+      // console.log("filter", filter);
+      // console.log('====================================');
+
+      let options = {};
+
+      if (filter === "model") {
+        options = {
+          make: "$make",
+          model: "$model"
+        }
+      } else if (filter === "series") {
+        options = {
+          make: "$make",
+          model: "$model",
+          series: "$series",
+        }
+      } else {
+        options = {
+          [filter]: `$${filter}`
+        }
+      }
+
+      console.log('====================================');
+      console.log("options", options);
+      console.log('====================================');
+
       let data = await this.model.aggregate([
         {
           $group:
           {
-            _id: {
-              make: "$make",
-              model: "$model",
-              series: "$series",
-              [filter]: `$${filter}`
-            },
+            _id: options,
             count: { $sum: 1 },
           },
         },
       ]);
+
+      // return data;
 
       for (let item of data) {
         let key = null;
@@ -299,27 +388,32 @@ exports.CarsRefresh = class CarsRefresh {
         else if (filter === 'series') key = `${item._id.make}|${item._id.model}`;
         else key = item._id[filter];
 
+        // if (!filters[filter][key]) filters[filter][key] = {count: item.count};
         if (!filters[filter][key]) filters[filter][key] = {};
 
         if (filter === 'model' || filter === 'series') {
-          if (filters[filter][key][item._id[filter]]) filters[filter][key][item._id[filter]].count += 1;
-          else filters[filter][key][item._id[filter]] = {count: 1};
+          filters[filter][key][item._id[filter]] = {count: item.count};
+        //   if (filters[filter][key][item._id[filter]]) filters[filter][key][item._id[filter]].count += 1;
+        //   else filters[filter][key][item._id[filter]] = {count: 1};
         } else {
-          if (filters[filter][key].count) filters[filter][key].count += 1;
-          else filters[filter][key] = {count: 1};
+          filters[filter][key] = {count: item.count};
+        //   if (filters[filter][key].count) filters[filter][key].count += 1;
+        //   else filters[filter][key] = {count: 1};
         }
       }
     }
 
-    let res = await this.modelCarFilters.findOneAndUpdate({}, filters);
+    // return filters;
 
-    if (!res) await this.modelCarFilters.create(filters);
+    let res = await this.app.service("car-filters").Model.findOneAndUpdate({}, filters);
+
+    if (!res) await this.app.service("car-filters").create(filters);
 
     return true;
   }
 
   async deleteRepit() {
-    let data = await this.model.aggregate([
+    let data = await this.app.service("cars").Model.aggregate([
       {
         $group:
         {
@@ -338,7 +432,7 @@ exports.CarsRefresh = class CarsRefresh {
     let _data = data.filter((el) => el.count >= 2);
 
     for (let item of _data) {
-      let res = await this.model.deleteOne({vin: item._id})
+      let res = await this.app.service("cars").Model.deleteOne({vin: item._id})
 
       // await this.model.delete({_id: res._id});
       console.log("res", res);
