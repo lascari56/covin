@@ -10,6 +10,8 @@ module.exports = {
         if (!!context.params.query.filter) {
           let data = [];
 
+          console.log("context.params.query.filter", context.params.query.filter);
+
           if (context.params.query.filter === "purchased_reports") {
             data = await context.app.service("report").find({
               query: {
@@ -119,6 +121,15 @@ module.exports = {
           user: context?.params?.user
         });
 
+        const notifications = await context.app.service('car-notifications').find({
+          query: {
+            car: {
+              $in: ids
+            }
+          },
+          user: context?.params?.user
+        });
+
         for (let index in data) {
           let item = data[index];
 
@@ -134,6 +145,9 @@ module.exports = {
             if (item._id.toString() === hidden.car.toString()) data[index].hidden = hidden;
           }
 
+          for (let notification of notifications) {
+            if (item._id.toString() === notification.car.toString()) data[index].notification = notification;
+          }
 
           // const index = data.findIndex((el) => {
           //   return el._id.toString() === item.car.toString();
