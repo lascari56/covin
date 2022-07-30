@@ -8,7 +8,7 @@ module.exports = function (app) {
       useUnifiedTopology: true
     }
   ).catch(err => {
-    logger.error(err);
+    console.log(err);
     process.exit(1);
   });
 
