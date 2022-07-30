@@ -65,6 +65,7 @@ exports.BillingStatus = class BillingStatus extends Service {
         // console.log("res",  wayForPayResponse.transactionStatus === 'Approved' && billingPreviousStatus !== 'Approved');
 
         if (
+          wayForPayResponse.transactionStatus !== 'Refunded' &&
           wayForPayResponse.transactionStatus === 'Approved' &&
           billingPreviousStatus !== 'Approved'
         ) {
