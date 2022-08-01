@@ -55,6 +55,18 @@ exports.CarsRefresh = class CarsRefresh {
     // return {status: "true"};
 
     try {
+
+      // return moment().unix()
+      // let carNotifications = await this.app.service("car-notifications").Model.findOneAndUpdate({
+      //   "buyNow.active": true,
+      //   "buyNow.status": false,
+      // }, {
+      //   "buyNow.price": null,
+      //   "buyNow.status": false
+      // });
+
+      // return carNotifications;
+
       let addLots = [];
       const {lots} = await this.getLots();
 
@@ -85,6 +97,11 @@ exports.CarsRefresh = class CarsRefresh {
       }).allowDiskUse(true);
 
       const endLotsIds = endLots.map((item) => item._id);
+      const lotsIds = lots.map((item) => item.lot_id);
+
+      // return await this.updateNotification({ids: lotsIds, data: lots});
+
+      // return true;
 
       // return endLotsIds;
 
@@ -113,6 +130,15 @@ exports.CarsRefresh = class CarsRefresh {
         // console.log("item", item);
 
         let res = await this.app.service("cars").Model.findOneAndUpdate({'lot_id': _item.lot_id}, _item)
+
+        // await this.app.service("car-notifications").Model.findOneAndUpdate({
+        //   "buyNow.active": true,
+        //   "buyNow.status": false,
+        //   car: _item._id,
+        // }, {
+        //   "buyNow.price": null,
+        //   "buyNow.status": false
+        // });
         // .then(async (res) => {
         //   statistics.update += 1;
         //   statistics[_item.site == '1' ? 'copart' : 'iaai'] += 1;
@@ -144,6 +170,10 @@ exports.CarsRefresh = class CarsRefresh {
       // console.log("statistics", statistics);
 
       await this.saveLotFilters();
+
+      await this.updateNotification({ids: lotsIds, data: lots});
+
+      // await this.updateNotification({ids: lotsIds, data: lots});
 
       await this.app.service("logs").create({
         message: `Count get api: ${lots.length}, Updated: ${statistics.update}, Added: ${statistics.add}, Deleted: ${endLotsIds.length}, Total: ${statistics.update + statistics.add}, Copart: ${statistics.copart}, IAAI: ${statistics.iaai}, File name saved: ${this.fileName}, File selled name saved: ${this.fileNameSelled}`,
@@ -471,5 +501,89 @@ exports.CarsRefresh = class CarsRefresh {
     });
 
     return resFile?.id
+  }
+
+  async updateNotification({ids, data}) {
+    // if (data.price_new) {
+      let items = await this.app.service("car-notifications").Model.find({
+        $or: [
+          {
+            "buyNow.active": true,
+            "buyNow.status": false,
+          },
+          {
+            "auction.active": true,
+            "auction.status": false,
+          }
+        ],
+        lotId: {
+          $in: ids
+        },
+      });
+
+      // return items;
+
+      for (let item of items) {
+        let res = {};
+        let isChange = false;
+
+        const car = await this.app.service("cars").get(item.car);
+
+        // return {res: moment(car.auction_date).unix() === moment(res.auction.auctionDate).unix()};
+
+        // return {car:  moment(car.auction_date).unix(), auctionDate: moment(res.auction.auctionDate).unix()};
+
+        if (item.buyNow.price !== car.price_new) {
+          res.buyNow = {...item.buyNow, price: car.price_new};
+          // res.buyNow.price = car.price_new;
+
+          console.log('====================================');
+          console.log("car.price_new", car.price_new);
+          console.log('====================================');
+
+          isChange = true;
+        }
+
+        if (moment(car.auction_date).unix() !== moment(item.auction.auctionDate).unix()) {
+          // res.auction.auctionDate = car.auction_date;
+          res.auction = {...item.auction, auctionDate: car.auction_date};
+
+          console.log('====================================');
+          console.log("car.auction_date", car.auction_date);
+          console.log('====================================');
+
+          isChange = true;
+        }
+
+        // return res;
+
+        if (isChange) {
+          console.log("isChange");
+          await this.app.service("car-notifications").patch(item._id, res)
+        }
+
+        // return {isChange};
+
+        // let res = {...item};
+
+        // if (condition) {
+
+        // }
+      }
+
+      return true;
+
+      // {
+      //   $in: ids
+      // }
+    // }
+
+    // await this.app.service("car-notifications").Model.findOneAndUpdate({
+      // "auction.active": true,
+      // "auction.status": false,
+    //   car: _item._id,
+    // }, {
+    //   "buyNow.auctionDate": data.auction_date,
+    // });
   }
 };

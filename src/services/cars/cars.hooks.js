@@ -1,4 +1,5 @@
 const { authenticate } = require('@feathersjs/authentication').hooks;
+const search = require('feathers-mongodb-fuzzy-search');
 
 module.exports = {
   before: {
@@ -78,7 +79,9 @@ module.exports = {
 
         return context;
         // console.log("comments", comments);
-      }
+      }, search({
+        fields: ['vin', "lot_id", "title"]
+      })
     ],
     get: [],
     create: [],
