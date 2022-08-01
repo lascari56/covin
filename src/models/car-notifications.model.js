@@ -8,8 +8,11 @@ module.exports = function (app) {
   const { Schema, Types } = mongooseClient;
   const schema = new Schema({
     car: {type: Types.ObjectId, ref: 'Car', required: true},
+    lotId: { type: String },
     client: {type: Types.ObjectId, ref: 'User'},
-    type: {type: Array},
+    buyNow: {type: JSON, default: {active: false}},
+    auction: {type: JSON, default: {active: false}},
+    // type: {type: Array},
     time: {type: Number},
   }, {
     timestamps: true
