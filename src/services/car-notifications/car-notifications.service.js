@@ -15,5 +15,9 @@ module.exports = function (app) {
   // Get our initialized service so that we can register hooks
   const service = app.service('car-notifications');
 
+  service.once('patched', data =>
+    console.log('First time a message has been removed', data)
+  );
+
   service.hooks(hooks);
 };
