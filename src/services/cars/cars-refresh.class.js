@@ -23,6 +23,12 @@ exports.CarsRefresh = class CarsRefresh {
   }
 
   async find () {
+    // await this.app.service("car-notifications").patch("62e6a526dc5882ecd778bb08", {
+    //   time: 15
+    // })
+
+    // return {status: true};
+
     // return await this.saveLotFilters();
     // await this.modelLogs.create({
     //   message: `Test`,
